@@ -470,7 +470,7 @@
 		exit();
 	}
 	
-		/* Delete schedule
+		/* Delete virtual sensor
 	--------------------------------------------------------------------------- */
 	if ($action == "deleteVirtualSensor") {
 		$query = "DELETE FROM ".$db_prefix."virtual_sensors WHERE user_id='".$user['user_id']."' AND id='".$getID."'";
@@ -483,41 +483,6 @@
 		header("Location: ?page=settings&view=virtualsensors&msg=02");
 		exit();
 	}
-	
-	/* add virtual sensor type
-	--------------------------------------------------------------------------- */
-/*	if ($action == "addVirtualSensorType") {
-			// Get POST data
-		$type_description = clean($_POST['type_description']);
-		$type_image = clean($_POST['type_image']);
-		$type_php = clean($_POST['type_php']);		
-			
-		$query = "INSERT INTO ".$db_prefix."plugins SET
-			type_description='".$type_description."',
-			phpfile='".$type_php."',
-			icon='".$type_image."'";
-		$result = $mysqli->query($query);
-
-		// Redirect
-		header("Location: ?page=settings&view=virtualsensors_types&msg=01");
-		exit();
-	}	*/
-	
-	/* delete virtual sensor type
-	--------------------------------------------------------------------------- */
-/*	if ($action == "deleteVirtualSensorType") {
-		$query = "DELETE FROM ".$db_prefix."plugins WHERE type_int='".$getID."'";
-		$result = $mysqli->query($query);
-		
-		//echo $query;
-		
-		$query2 = "DELETE FROM ".$db_prefix."plugins_config WHERE type_int='".$getID."'";
-		$result2 = $mysqli->query($query2);
-
-		// Redirect
-		header("Location: ?page=settings&view=virtualsensors_types&msg=01");
-		exit();
-	}	*/
 	
 	/* Put on main
 	--------------------------------------------------------------------------- */
@@ -587,4 +552,142 @@
 		exit();
 	}
 
+	
+	/* update virtual device
+	 --------------------------------------------------------------------------- */
+	if ($action == "updateVirtualDevice") {
+		// Get POST data
+		$virtualdevice_description = clean($_POST['virtualdevice_description']);
+	
+		$query = "UPDATE ".$db_prefix."virtual_devices SET description='".$virtualdevice_description."' where id = '".$getID."'";
+		$result = $mysqli->query($query);
+	
+		// for every para starts with virtualsensor_value_
+		foreach (array_keys($_POST)  as $postkey) {
+			$para_prefix = "virtualdevice_value_";
+			if(strpos($postkey, $para_prefix) === 0){
+				$configId = substr($postkey, strlen($para_prefix));
+				$configValue = clean($_POST[$postkey]);;
+				$queryInsert2 = "UPDATE ".$db_prefix."plugins_instance_config SET
+					value='".$configValue."'
+					WHERE sensor_id='".$getID."'
+					AND config_id='".$configId."'";
+				$resultInsert2 = $mysqli->query($queryInsert2);
+			}
+		}
+	
+		// Redirect
+		header("Location: ?page=settings&view=virtualdevices&msg=04");
+		exit();
+	}
+	
+	/* add virtual device
+	 --------------------------------------------------------------------------- */
+	if ($action == "addVirtualDevice") {
+		// Get POST data
+		$virtualdevice_description = clean($_POST['virtualdevice_description']);
+		$plugin_id = clean($_POST['plugin_id']);
+			
+		$query = "INSERT INTO ".$db_prefix."virtual_devices SET
+			user_id='".$user['user_id']."',
+			description='".$virtualdevice_description."',
+			plugin_id='".$plugin_id."',
+			last_status = '".time()."',
+			last_switch = '".time()."',
+			online = '1',
+			editable = '1',
+			show_in_main = '0'";
+		$result = $mysqli->query($query);
+		$vSensorId = $mysqli->insert_id;
+	
+		// for every para starts with virtualsensor_value_
+		foreach (array_keys($_POST)  as $postkey) {
+			$para_prefix = "virtualdevice_value_";
+			if(strpos($postkey, $para_prefix) === 0){
+				$configId = substr($postkey, strlen($para_prefix));
+				$configValue = clean($_POST[$postkey]);;
+				$queryInsert2 = "INSERT INTO ".$db_prefix."plugins_instance_config SET
+					sensor_id='".$vSensorId."',
+					value='".$configValue."',
+					config_id='".$configId."'";
+				$resultInsert2 = $mysqli->query($queryInsert2);
+			}
+		}
+	
+		// Redirect
+		header("Location: ?page=settings&view=virtualdevices&msg=01");
+		exit();
+	}
+
+	
+	/* Put on main
+	 --------------------------------------------------------------------------- */
+	if ($action == "putOnMainVirtualDevice") {
+	
+		$getCurrentValue = getField("show_in_main", "".$db_prefix."virtual_devices", "WHERE id='".$getID."'");
+	
+		if ($getCurrentValue == 0) {
+			$query = "UPDATE ".$db_prefix."virtual_devices SET show_in_main='1' WHERE user_id='".$user['user_id']."' AND id='".$getID."'";
+			$result = $mysqli->query($query);
+		} else {
+			$query = "UPDATE ".$db_prefix."virtual_devices SET show_in_main='0' WHERE user_id='".$user['user_id']."' AND id='".$getID."'";
+			$result = $mysqli->query($query);
+		}
+	
+		// Redirect
+		header("Location: ?page=settings&view=virtualdevices&msg=03");
+		exit();
+	}
+	
+	/*
+	 --------------------------------------------------------------------------- */
+	if ($action == "setMonitoringDevice") {
+		$getCurrentValue = getField("monitoring", "".$db_prefix."virtual_devices", "WHERE id='".$getID."'");
+	
+		if ($getCurrentValue == 0) {
+			$query = "UPDATE ".$db_prefix."virtual_devices SET monitoring='1' WHERE user_id='".$user['user_id']."' AND id='".$getID."'";
+			$result = $mysqli->query($query);
+		} else {
+			$query = "UPDATE ".$db_prefix."virtual_devices SET monitoring='0' WHERE user_id='".$user['user_id']."' AND id='".$getID."'";
+			$result = $mysqli->query($query);
+		}
+	
+		// Redirect
+		header("Location: ?page=settings&view=virtualdevices&msg=03");
+		exit();
+	}
+
+	
+	/*
+	 --------------------------------------------------------------------------- */
+	if ($action == "setOnlineDevice") {
+		$getCurrentValue = getField("online", "".$db_prefix."virtual_devices", "WHERE id='".$getID."'");
+	
+		if ($getCurrentValue == 0) {
+			$query = "UPDATE ".$db_prefix."virtual_devices SET online='1' WHERE user_id='".$user['user_id']."' AND id='".$getID."'";
+			$result = $mysqli->query($query);
+		} else {
+			$query = "UPDATE ".$db_prefix."virtual_devices SET online='0' WHERE user_id='".$user['user_id']."' AND id='".$getID."'";
+			$result = $mysqli->query($query);
+		}
+	
+		// Redirect
+		header("Location: ?page=settings&view=virtualdevices&msg=03");
+		exit();
+	}
+	
+	
+	/* Delete virtual device
+	 --------------------------------------------------------------------------- */
+	if ($action == "deleteVirtualDevice") {
+		$query = "DELETE FROM ".$db_prefix."virtual_devices WHERE user_id='".$user['user_id']."' AND id='".$getID."'";
+		$result = $mysqli->query($query);
+	
+		$query2 = "DELETE FROM ".$db_prefix."virtual_devices WHERE sensor_id='".$getID."'";
+		$result2 = $mysqli->query($query2);
+	
+		// Redirect
+		header("Location: ?page=settings&view=virtualdevices&msg=02");
+		exit();
+	}	
 ?>

@@ -167,7 +167,7 @@
 		    		echo "</div>";
 
 		    		echo "<div style='font-size:10px'>";
-		    			echo ago(getLastVirtualSensorCheck($row['id']));
+		    			echo $lang["last check"].": ".ago(getLastVirtualSensorCheck($row['id']));
 		    		echo "</div>";
 
 		    	echo "</div>";
@@ -191,7 +191,7 @@
 		
 		var type_id = $('#virtual_sensor_id').val();
 		
-		$.getJSON("inc/plugins/getPluginConfig.php?type_int="+type_int+"&sensor_id="+type_id, function(data) {
+		$.getJSON("inc/plugins/getPluginConfig.php?type_int="+type_int+"&plugin_id="+type_id, function(data) {
 			// remove all from 1 on
 			$('#configValues').find('tr:gt(1)').remove();
 			

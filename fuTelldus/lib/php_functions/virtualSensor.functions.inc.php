@@ -273,7 +273,7 @@
 		global $db_prefix;
 		global $mysqli;
 
-		$queryTimestamp = "select last_check from futelldus_virtual_sensors where id='".$virtualSensorID."' order by last_check desc limit 1";
+		$queryTimestamp = "select last_check from ".$db_prefix."virtual_sensors where id='".$virtualSensorID."' order by last_check desc limit 1";
 		$result = $mysqli->query($queryTimestamp);
 		$timeStamp=0;
 		if (mysqli_num_rows($result) == 1) {

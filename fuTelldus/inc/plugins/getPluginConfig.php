@@ -16,14 +16,14 @@
 	mysqli_set_charset($mysqli, "utf8");
 	
 	$type_int = clean($_GET['type_int']);
-	$sensor_id = clean($_GET['sensor_id']);
+	$plugin_id = clean($_GET['plugin_id']);
 	
 	// decide if the current config value should be attached or not
-	if (strlen($sensor_id) > 0) {
+	if (strlen($plugin_id) > 0) {
 		$query = "SELECT vstc.id, vstc.value_key, vstc.value_type, vstc.description, vsc.value as config_value
 			FROM ".$db_prefix."plugins_config vstc, ".$db_prefix."plugins_instance_config vsc 
 			where vsc.config_id = vstc.id 
-			and vsc.sensor_id=$sensor_id 
+			and vsc.sensor_id=$plugin_id 
 			and vstc.type_int=$type_int 
 			and vstc.value_type not like 'return%'";
 	} else {

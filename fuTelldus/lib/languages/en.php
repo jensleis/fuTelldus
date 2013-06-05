@@ -38,6 +38,7 @@ $lang = array(
 	"Select device" => "Select device",
 	"Test message sent" => "Test message sent",
 	"Plugins" => "Plugins",
+	"last check" => "last check",
 
 	// User
 	"Usersettings" => "Usersettings",
@@ -124,7 +125,7 @@ $lang = array(
 		
 	// Plugins
 	"Add virtual sensor" => "Add virtual sensor",
-	"Add virtual devices" => "Add virtual devices",
+	"Add virtual device" => "Add virtual device",
 	"Host available" => "Host available",
 	"Device as sensor" => "Device as sensor",
 	"Add sensor" => "Add sensor",
