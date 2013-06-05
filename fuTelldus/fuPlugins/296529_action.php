@@ -54,7 +54,7 @@ $maxOfflineChecks = 100;
 		global $host, $sshport, $adminport, $maxOfflineChecks;
 	
 		$connection = ssh2_connect($host, $sshport);
-		ssh2_auth_password($connection, 'root', 'Lb77rghf');
+		ssh2_auth_password($connection, 'root', 'ccc');
 
 		// send nas to safe mode
 		$stdout = ssh2_exec($connection, '/usr/syno/bin/synologset1 sys warn 0x11300011');
