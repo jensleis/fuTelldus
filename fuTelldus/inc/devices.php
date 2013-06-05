@@ -16,7 +16,6 @@
 	if ($userTelldusConf['sync_from_telldus'] == 1) {
 		require_once 'HTTP/OAuth/Consumer.php';
 
-
 		$consumer = new HTTP_OAuth_Consumer(constant('PUBLIC_KEY'), constant('PRIVATE_KEY'), constant('TOKEN'), constant('TOKEN_SECRET'));
 
 		//$params = array();
@@ -33,8 +32,6 @@
 
 		$xmlString = $response->getBody();
 		$xmldata = new SimpleXMLElement($xmlString);
-
-
 
 
 		/* Store devices in DB
@@ -71,7 +68,6 @@
 
 		echo "<div class='hidden-phone' style='float:right; margin-right:25px; margin-bottom:-50px; color:green; font-size:10px;'>{$lang['List synced']}</div>";
 	}
-
 
 
 	echo "<div style='float:right; height:20px; margin-right:20px;' id='ajaxFeedback'></div>";
@@ -130,7 +126,7 @@
 			echo "</thead>";
 			
 			echo "<tbody>";
-				$query = "SELECT * FROM ".$db_prefix."devices WHERE type='device' AND user_id='{$user['user_id']}' ORDER BY name ASC LIMIT 100";
+				$query = "SELECT * FROM ".$db_prefix."devices WHERE type='device' AND user_id='{$user['user_id']}' ORDER BY name ASC";
 				$result = $mysqli->query($query);
 
 				while ($row = $result->fetch_array()) {
@@ -172,5 +168,66 @@
 		echo "</table>";
 	//echo "</div>";
 
+		
+		/* List virtual devices
+		 --------------------------------------------------------------------------- */
+		echo "<h3 class='hidden-phone'>{$lang['Virtual devices']}</h3>";
+		
+		//echo "<div class='well'>";
+		echo "<table class='table table-striped table-hover'>";
+			echo "<thead class='hidden-phone'>";
+				echo "<tr>";
+					echo "<th>{$lang['Name']}</th>";
+					echo "<th class='hidden-phone' width='40%'>{$lang['Plugin']}</th>";
+					echo "<th width='20%'></th>";
+				echo "</tr>";
+			echo "</thead>";
+									
+			echo "<tbody>";
+			$query = "select * from futelldus_virtual_devices vd, futelldus_plugins p where p.type_int = vd.plugin_id and vd.user_id='{$user['user_id']}' order by vd.description asc";
+			$result = $mysqli->query($query);
+			
+			while ($row = $result->fetch_array()) {
+					echo "<tr valign='top'>";
+						echo "<td>";
+							echo "<div style='display:inline-block;' id='ajax_loader_{$row['id']}'></div>";
+							echo "{$row['description']}";
+						echo "</td>";
+
+						echo "<td class='hidden-phone'>{$row['type_description']}</td>";
+						echo "<td style='text-align:right;'>";
+
+						$deviceState = 0;
+						if ($userTelldusConf['sync_from_telldus'] == 1) {
+							// get actual state from device
+							$deviceState = getCurrentVirtualDeviceState($row['id']);
+						} else {
+							// get last state from device	
+							$deviceState = getLastVirtualDeviceStatus($row['id']);
+						}
+						
+						if ($deviceState == 1) {
+							$activeStateOn = "btn-success active";
+							$activeStateOff = "";
+						} elseif ($deviceState == 0) {
+							$activeStateOn = "";
+							$activeStateOff = "btn-success active";
+						}
+						else {
+							$activeStateOff = "";
+							$activeStateOn = "";
+						}
+
+							
+
+							echo "<div class='btn-group'>";
+								echo "<a id='btn_{$row['id']}_off' class='btn $activeStateOff' href=\"javascript:lightControl('off', '{$row['id']}');\">{$lang['Off']}</a>";
+								echo "<a id='btn_{$row['id']}_on' class='btn $activeStateOn' href=\"javascript:lightControl('on', '{$row['id']}');\">{$lang['On']}</a>";
+							echo "</div>";
+						echo "</td>";
+					echo "</tr>";
+				}
+			echo "</tbody>";
+		echo "</table>";		
 
 ?>

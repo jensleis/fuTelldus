@@ -62,11 +62,10 @@ namespace synology\owl_energy_monitor;
 		/* Check for 404 (file not found). */
 		$httpCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
 		curl_close($handle);
-		
-		if($httpCode == 0) {
-			return 1;
-		} else {
+		if($httpCode==0 or $httpCode >= 400) {
 			return 0;
+		} else {
+			return 1;
 		}
 	}
 	

@@ -46,7 +46,7 @@
 		$nameSpace = includePlugin($phpscript."/index.php");
 		$func = $nameSpace."\\getVirtualSensorVal";	
 		//include_once $phpscript."/index.php";		
-		$returnFromScript = @$func($parameter, $virtualSensorID); 	
+		$returnFromScript = @$func($parameter, $virtualSensorID);
 		
 		// update last check
 		$lastUpdated = time();
@@ -294,4 +294,15 @@
 		
 		return $dashboardwidget; //$lastValue['value'];
 	}
+	
+	function getPluginPathToVSensorId($sensorID) {
+		global $mysqli;
+		global $db_prefix;
+	
+		$query = "select vst.plugin_path from ".$db_prefix."virtual_sensors vs, ".$db_prefix."plugins vst where vs.id=$sensorID and vs.sensor_type=vst.type_int";
+		$result = $mysqli->query($query);
+		$phpscript = $result->fetch_assoc();
+		return $phpscript['plugin_path'];
+	}	
+	
 ?>

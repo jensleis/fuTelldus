@@ -38,7 +38,9 @@ $lang = array(
 	"Select device" => "Select device",
 	"Test message sent" => "Test message sent",
 	"Plugins" => "Plugins",
+	"Plugin" => "Plugin",
 	"last check" => "last check",
+	"last switch" => "last switch",
 
 	// User
 	"Usersettings" => "Usersettings",

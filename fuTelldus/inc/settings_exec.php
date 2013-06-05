@@ -592,7 +592,7 @@
 			user_id='".$user['user_id']."',
 			description='".$virtualdevice_description."',
 			plugin_id='".$plugin_id."',
-			last_status = '".time()."',
+			last_status = '0',
 			last_switch = '".time()."',
 			online = '1',
 			editable = '1',

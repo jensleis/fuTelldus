@@ -159,7 +159,7 @@
 		    		echo "</div>";
 
 		    		echo "<div style='font-size:10px'>";
-		    			echo $lang["last check"].": ".ago(getLastVirtualDeviceStatusCheck($row['id']));
+		    			echo $lang["last switch"].": ".ago(getLastVirtualDeviceStatusSwitch($row['id']));
 		    		echo "</div>";
 
 		    	echo "</div>";

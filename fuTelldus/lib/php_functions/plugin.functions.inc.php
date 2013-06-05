@@ -97,15 +97,7 @@
 		return $pluginPath;
 	}
 	
-	function getPluginPathToVSensorId($sensorID) {
-		global $mysqli;
-		global $db_prefix;
-		
-		$query = "select vst.plugin_path from ".$db_prefix."virtual_sensors vs, ".$db_prefix."plugins vst where vs.id=$sensorID and vs.sensor_type=vst.type_int";
-		$result = $mysqli->query($query);
-		$phpscript = $result->fetch_assoc();
-		return $phpscript['plugin_path'];
-	}
+
 	
 	function updatePlugin($pluginID, $version) {
 		global $mysqli;
