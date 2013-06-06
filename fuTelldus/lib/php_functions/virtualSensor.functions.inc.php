@@ -31,14 +31,8 @@
 	function getCurrentVirtualSensorState($virtualSensorID) {
 		global $mysqli;
 		global $db_prefix;
-		
-		$query = "select vstc.value_key, vsc.value from ".$db_prefix."plugins_instance_config vsc, ".$db_prefix."plugins_config vstc where vsc.sensor_id=$virtualSensorID and vstc.id = vsc.config_id and vstc.value_type!='return'";
-		$result = $mysqli->query($query);
 
-		$parameter = array();
-		while ($row = $result->fetch_array()) {
-			$parameter[$row['value_key']] = $row['value'];
-		}
+		$parameter = getPluginParameters($virtualSensorID);
 
 		// find the script
 		$phpscript = getPluginPathToVSensorId($virtualSensorID);

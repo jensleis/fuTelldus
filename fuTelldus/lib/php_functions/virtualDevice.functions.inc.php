@@ -31,14 +31,8 @@
 		global $mysqli;
 		global $db_prefix;
 		
-		$query = "select pc.value_key, pic.value from ".$db_prefix."plugins_instance_config pic, ".$db_prefix."plugins_config pc where pic.sensor_id=$deviceID and pc.id = pic.config_id and pc.value_type!='return'";
-		$result = $mysqli->query($query);
-
-		$parameter = array();
-		while ($row = $result->fetch_array()) {
-			$parameter[$row['value_key']] = $row['value'];
-		}
-
+		$parameter = getPluginParameters($deviceID);
+		
 		// find the script
 		$phpscript = getPluginPathToVDeviceId($deviceID);
 		

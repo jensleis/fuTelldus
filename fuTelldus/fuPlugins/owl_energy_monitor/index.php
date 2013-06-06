@@ -118,8 +118,8 @@ namespace virtual_devices\owl_energy_monitor;
 
 		$datafilepath=$parameter['datafilepath']; //"/cm160_data.db.txt";
 
-		$lastCheck = getLastVirtualSensorLogTimestamp($virtualSensorID)-3600; // remove an hour, to be sure
-		$currentTime = time() + date('Z') +3600; // add an hour, just in case if the clocks are not synchron
+		$lastCheck = getLastVirtualSensorLogTimestamp($virtualSensorID)-300; // remove an hour, to be sure
+		$currentTime = time() + date('Z') +300; // add an hour, just in case if the clocks are not synchron
 		
 		$row = 1;
 		$avgConsumption = 0;

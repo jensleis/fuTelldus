@@ -1,4 +1,5 @@
 <script src="lib/jscripts/futelldus_lights.js"></script>
+<script src="lib/jscripts/futelldus_devices.js"></script>
 
 
 <?php
@@ -221,8 +222,8 @@
 							
 
 							echo "<div class='btn-group'>";
-								echo "<a id='btn_{$row['id']}_off' class='btn $activeStateOff' href=\"javascript:lightControl('off', '{$row['id']}');\">{$lang['Off']}</a>";
-								echo "<a id='btn_{$row['id']}_on' class='btn $activeStateOn' href=\"javascript:lightControl('on', '{$row['id']}');\">{$lang['On']}</a>";
+								echo "<a id='btn_{$row['id']}_off' class='btn $activeStateOff' href=\"javascript:deviceControl('off', '{$row['id']}');\">{$lang['Off']}</a>";
+								echo "<a id='btn_{$row['id']}_on' class='btn $activeStateOn' href=\"javascript:deviceControl('on', '{$row['id']}');\">{$lang['On']}</a>";
 							echo "</div>";
 						echo "</td>";
 					echo "</tr>";
