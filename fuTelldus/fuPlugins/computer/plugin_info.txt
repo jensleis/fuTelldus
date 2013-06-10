@@ -1,0 +1,5 @@
+name = PC remote power
+author = Jens Leisenberg
+version = 2
+type = device
+description = 'Turns your computer on and off.'
