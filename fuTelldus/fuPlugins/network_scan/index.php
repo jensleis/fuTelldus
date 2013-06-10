@@ -3,7 +3,7 @@ namespace virtual_devices\network_scan;
 
 /*
  Needs:
-	nmap tool on console
+	nmap tool on console with privileges
 */
 
 /*	$paras = array(
@@ -42,7 +42,6 @@ namespace virtual_devices\network_scan;
 		$myPath = getPluginPathToVSensorId($virtualSensorID);
 	
 		$widget = "";
-		$widget.="<div class='sensor-blocks well'>";
 
 			$widget.= "<div class='sensor-name'>";
 				$widget.= getVirtualSensorDescriptionToSensorId($virtualSensorID);
@@ -75,7 +74,6 @@ namespace virtual_devices\network_scan;
 				
 				$widget.= "<abbr class=\"timeago\" title='".date("c", $timeUpdatedByInsertedLog)."' ".$timeStyle.">".date("d-m-Y H:i", $timeUpdatedByInsertedLog)."</abbr>";
 			$widget.= "</div>";
-			$widget.= "</div>";	
 		
 		return $widget;
 	}
@@ -87,36 +85,52 @@ namespace virtual_devices\network_scan;
 		$addSNMPCheck = $parameter['addSNMPCheck']; //"check via SNMP?";
 		$wakeupWithLastIP = $parameter['wakeupWithLastIP']; //"send NMAP package on port 62078 before testing? --> wakeup iPhone's wifi";
 
+		$available = 0;
+		$ip;
+		$returnLastLog = false;
+		
+		// fastpath - ping the ip
+		$available = tryPing($parameter, $virtualSensorID);
+		if ($available==1){
+			$ip = getLastIP($virtualSensorID);
+			$returnValArr = array(
+					'available'=>$available,
+					'ip'=>$ip
+			);
+			return $returnValArr;
+		}
+		
 		if ($wakeupWithLastIP=='true') {
 			tryWakeUpWithOldIP($virtualSensorID);
 		}
 		
-		$snmpResult = 0;
-		if ($addSNMPCheck=='true') {
-			$snmpResult = trySNMPCheck($parameter, $virtualSensorID);
+		if ($available<=0) {
+			$ip = getDeviceIP($host, $device);
+			if (isset($ip) and strlen(trim($ip))>0) {
+				$available=1;
+			}
+		}
+
+		if ($available<=0) {
+			if ($addSNMPCheck=='true') {
+				$available = trySNMPCheck($parameter, $virtualSensorID);
+				// if snmp is enabled, we might get true back, but the IP is blank. But this
+				// don't effect the availability ... maybe we have no IP for minute or so.
+				if($available==1) {
+					$returnLastLog = true;
+				}
+			}
 		}
 		
-		$ip = getDeviceIP($host, $device);
-		$available=0;
-		if (isset($ip) and strlen(trim($ip))>0) {
-			$available=1;
-			$returnValArr = array(
-				'available'=>$available,
-				'ip'=>$ip
-			);
+		
+		if ($returnLastLog){
+			$returnValArr = getLastVirtualSensorLog($virtualSensorID);
 		} else {
-			// if snmp is enabled, we might get true back, but the IP is blank. But this 
-			// don't effect the availability ... maybe we have no IP for minute or so.
-			$available=$snmpResult;
-			if($available==1) {
-				$returnValArr = getLastVirtualSensorLog($virtualSensorID);
-			} else {
-				$returnValArr = array(
+			$returnValArr = array(
 					'available'=>$available,
 					'ip'=>$ip
-				);
-			}
-		}		
+			);
+		}
 		
 		$tmpValKey="lastOfflineState";	
 		if ($available == 0) {
@@ -126,6 +140,19 @@ namespace virtual_devices\network_scan;
 			deleteVirtualSensorTmpVal($virtualSensorID, $tmpValKey);
 		}
 		return $returnValArr;
+	}
+	
+	function tryPing($parameter, $virtualSensorID) {
+		$lastIP = getLastIP($virtualSensorID);
+	
+		$shellCommand = "sudo nmap -sP --max-retries=1 --host-timeout=125ms ".$lastIP." | grep  'Host is up' | wc -l 2>&1";
+		
+		$output = shell_exec($shellCommand);
+		
+		if (strlen(trim($output))>0) {
+			return $output;
+		}
+		return 0;
 	}
 	
 	function checkTimeOut($virtualSensorID, $currentState, $timeout, $tmpValKey) {
@@ -154,7 +181,7 @@ namespace virtual_devices\network_scan;
 	
 	
 	function getDeviceIP($host, $device) {
-		$shellCommand = "nmap -sP ".$host."/24 | grep -B2 -i ".$device." 2>&1";
+		$shellCommand = "sudo nmap -sP ".$host."/24 | grep -B2 -i ".$device." 2>&1";
 		$output = shell_exec($shellCommand);
 		
 		if (strlen(stristr($output,$device))>0) {
@@ -172,22 +199,31 @@ namespace virtual_devices\network_scan;
 	
 	function wakeup($ip) {
 		// contact the iphone on port 62078 to keep wifi on
-		$command = "nmap -P0 -sT -p62078 ".$ip." 2>&1";
+		$command = "sudo nmap -P0 -sT -p62078 ".$ip." 2>&1";
 		shell_exec($command);
 	}
 
 	function tryWakeUpWithOldIP($virtualSensorID) {
+		$ip = getLastIP($virtualSensorID);
+		wakeup($ip);
+		
+		//wait a second
+		sleep(3);
+	}
+	
+	function getLastIP($virtualSensorID) {
 		global $mysqli;
 		global $db_prefix;
 		
 		$query = "select lv.value from ".$db_prefix."virtual_sensors_log l, ".$db_prefix."virtual_sensors_log_values lv where l.id = lv.log_id and lv.value_key='ip' and l.sensor_id=".$virtualSensorID." and lv.value is not null and LENGTH(lv.value)>0 order by l.time_updated desc limit 1";
-	    $result = $mysqli->query($query);
+		$result = $mysqli->query($query);
+		$ip_arr = $result->fetch_assoc();
 		
-		$ip = $result->fetch_assoc();
-		wakeup($ip['value']);
-		
-		//wait a second
-		sleep(3);
+		if (sizeof($ip_arr)==1) {
+			return $ip_arr['value'];
+		} else {
+			return "";
+		}
 	}
 	
 	function trySNMPCheck($parameter, $virtualSensorID) {

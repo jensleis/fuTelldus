@@ -86,7 +86,6 @@ namespace virtual_devices\owl_energy_monitor;
 		$consumptionWatt = $consumptionAmpere * $voltageConfig;
 
 		$widget = "";
-		$widget.="<div class='sensor-blocks well'>";
 
 			$widget.= "<div class='sensor-name'>";
 				$widget.= getVirtualSensorDescriptionToSensorId($virtualSensorID);
@@ -108,7 +107,6 @@ namespace virtual_devices\owl_energy_monitor;
 				}
 				
 				$widget.= "<abbr class=\"timeago\" title='".date("c", $timeUpdatedByInsertedLog)."'>".date("d-m-Y H:i", $timeUpdatedByInsertedLog)."</abbr>";
-			$widget.= "</div>";
 			$widget.= "</div>";	
 		
 		return $widget;

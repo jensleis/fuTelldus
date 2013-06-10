@@ -51,7 +51,8 @@
 		
 			// add hidden field with actual virtual sensor id
 			echo "<input type='hidden' name='virtual_sensor_id' id ='virtual_sensor_id' value='$getID' />";
-		
+			echo "<input type='hidden' name='user_id' id ='user_id' value='{$user['user_id']}' />";
+			
 			echo "<table width='100%' id='configValues'>";
 
 				echo "<tr>";
@@ -117,7 +118,7 @@
 						echo "<div class='btn-group'>";
 
 							$toggleClass = "";
-							if ($row['show_in_main'] == 1){
+							if ($row['show_in_main'] >= 1){
 								$toggleClass = "btn-success";
 							} else {
 								$toggleClass = "btn-warning";
@@ -133,7 +134,7 @@
 							echo "</a>";
 
 							echo "<ul class='dropdown-menu'>";
-								if ($row['show_in_main'] == 1)
+								if ($row['show_in_main'] >= 1)
 				    				echo "<li><a href='?page=settings_exec&action=putOnMainVirtualSensor&id={$row['id']}'>Remove from main</a></li>";
 				    			else
 				    				echo "<li><a href='?page=settings_exec&action=putOnMainVirtualSensor&id={$row['id']}'>Put on main</a></li>";
@@ -181,15 +182,16 @@
 ?>
 
 <script type="text/javascript">
-	$('#virtualsensor_type').change(function () {
+	$('#plugin_id').change(function () {
 	
 		var type_int = $(this).val();
+		var user_id = $('#user_id').val(); 
 		
 		if (type_int < 0) {
 			$('#configValues').find('tr:gt(1)').remove();		
 		}
 		
-		var type_id = $('#virtual_sensor_id').val();
+		var type_id = $('#virtual_device_id').val();
 		
 		$.getJSON("inc/plugins/getPluginConfig.php?type_int="+type_int+"&plugin_id="+type_id, function(data) {
 			// remove all from 1 on
@@ -199,16 +201,47 @@
 			jQuery.each(data , function(index, value){
 				var value_description = value.description;
 				var value_key = value.value_key;
-				var value_type = value.value_type;
+				var value_type_config = $.csv.toArray(value.value_type, {separator:';'});
+				var value_type = value_type_config[0];
 				var config_value = value.config_value;
 				var id = value.id;
-				if (value_type.toUpperCase() == "boolean".toUpperCase()) {
+				
+				if (value_type.toUpperCase() == "plugin".toUpperCase()) {
+					// get all configured plugin instances for this user
+					var plugin_type = value_type_config[1];
+					var plugin_name = value_type_config[2];	
+					$.getJSON("inc/plugins/getPluginInstances.php?type="+plugin_type+"&plugin_name="+plugin_name+"&user_id="+user_id, function(data1) {
+						var htmlElementSelect = "<select name='virtualdevice_value_"+id+"' id='virtualdevice_value_"+id+"'>";
+						if (config_value<0) {
+							htmlElementSelect += "<option value='-1' selected='selected'></option>";		
+						} else {
+							htmlElementSelect += "<option value='-1'></option>";
+						}
+						
+						
+						jQuery.each(data1 , function(index1, value1){
+							var plugin_description = value1.description;
+							var plugin_key = value1.id;
+							var selected = "";
+							if (plugin_key==config_value) {
+								selected = "selected='selected'"
+							}
+							htmlElementSelect += "<option value='"+plugin_key+"' "+selected+">"+plugin_description+"</option>";
+						});
+						
+						htmlElementSelect += "</select>";
+						
+						$('#configValues tr:last').after("<tr><td>"+value_description+"</td>"+
+								"<td>"+htmlElementSelect+"</td><td></td></tr>");
+					});
+					
+				} else if (value_type.toUpperCase() == "boolean".toUpperCase()) {
 					var selectedTrue, selectedFalse = 0;
 					if (config_value.toUpperCase() == "true".toUpperCase()) selectedTrue="selected='selected'";
 					if (config_value.toUpperCase() == "false".toUpperCase()) selectedFalse="selected='selected'";
-					$('#configValues tr:last').after("<tr><td>"+value_description+"</td><td><select name='virtualsensor_value_"+id+"'><option value='true' "+selectedTrue+">true</option><option value='false' "+selectedFalse+">false</option></select</td><td></td></tr>");
+					$('#configValues tr:last').after("<tr><td>"+value_description+"</td><td><select name='virtualdevice_value_"+id+"'><option value='true' "+selectedTrue+">true</option><option value='false' "+selectedFalse+">false</option></select</td><td></td></tr>");
 				} else {
-					$('#configValues tr:last').after("<tr><td>"+value_description+"</td><td><input style='width:180px;' type='"+value_type+"' name='virtualsensor_value_"+id+"' id='virtualsensor_value_"+id+"' value='"+config_value+"' /></td><td></td></tr>");
+					$('#configValues tr:last').after("<tr><td>"+value_description+"</td><td><input style='width:180px;' type='"+value_type+"' name='virtualdevice_value_"+id+"' id='virtualdevice_value_"+id+"' value='"+config_value+"' /></td><td></td></tr>");
 				}
 			});
 		});

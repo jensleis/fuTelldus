@@ -46,6 +46,7 @@
 
 			$monitorSensor = 0;
 			$monitorSensor = getField("monitoring", "".$db_prefix."sensors", "WHERE sensor_id='".$sensorData['id']."'");
+			$showInMain = getField("show_in_main", "".$db_prefix."sensors", "WHERE sensor_id='".$sensorData['id']."'");
 			$publicValue = getField("public", "".$db_prefix."sensors", "WHERE sensor_id='".$sensorData['id']."'");
 
 			// Use REPLACE INTO to overwrite with device_id as primary
@@ -60,6 +61,7 @@
 						online='".$online."',  
 						editable='".$editable."',
 						monitoring='".$monitorSensor."',
+						show_in_main='".$showInMain."',
 						public='".$publicValue."'";
 			$result = $mysqli->query($query);
 		}

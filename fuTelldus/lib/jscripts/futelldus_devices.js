@@ -46,7 +46,8 @@ function deviceControl(state, deviceID) {
 			}
 		}
 
-		ajaxRequest.open("GET", "ajax_device_control.php?state=" + state + "&id=" + deviceID + "&&rand=" + Math.random()*9999, true);
+		url = "ajax_device_control.php?state=" + state + "&id=" + deviceID + "&&rand=" + Math.random()*9999;
+		ajaxRequest.open("GET", url, true);
 		ajaxRequest.send(null); 
 	}
 }

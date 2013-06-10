@@ -587,7 +587,7 @@
 		// Get POST data
 		$virtualdevice_description = clean($_POST['virtualdevice_description']);
 		$plugin_id = clean($_POST['plugin_id']);
-			
+			 
 		$query = "INSERT INTO ".$db_prefix."virtual_devices SET
 			user_id='".$user['user_id']."',
 			description='".$virtualdevice_description."',

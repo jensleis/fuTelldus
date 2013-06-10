@@ -97,8 +97,6 @@
 		return $pluginPath;
 	}
 	
-
-	
 	function updatePlugin($pluginID, $version) {
 		global $mysqli;
 		global $db_prefix;
@@ -182,22 +180,24 @@
 				
 			$queryDeleteVirtualSensorConfig = "delete from ".$db_prefix."virtual_sensors where id='".$sensorID."'";
 			$mysqli->query($queryDeleteVirtualSensorConfig);
-				
-
 		}
+		
 	}
 	
 	function disableDevicePlugin($pluginID) {
 		global $mysqli;
 		global $db_prefix;
-		
+
 		$querySelectVirtualSensor = "select * from ".$db_prefix."virtual_devices where plugin_id='".$pluginID."'";
 		$resultAllSensors = $mysqli->query($querySelectVirtualSensor);
 		
 		while ($row = $resultAllSensors->fetch_array()) {
-			$queryDeleteVirtualSensorConfig = "delete from ".$db_prefix."virtual_devices where id='".$sensorID."'";
+			$deviceID = $row['id'];
+			
+			$queryDeleteVirtualSensorConfig = "delete from ".$db_prefix."virtual_devices where id='".$deviceID."'";
 			$mysqli->query($queryDeleteVirtualSensorConfig);
 		}
+		
 	}
 	
 	function getPluginConfigToKey($virtualSensorID, $config_key) {

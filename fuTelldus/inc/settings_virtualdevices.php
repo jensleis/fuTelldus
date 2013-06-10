@@ -51,6 +51,7 @@
 		
 			// add hidden field with actual virtual device id
 			echo "<input type='hidden' name='virtual_device_id' id ='virtual_device_id' value='$getID' />";
+			echo "<input type='hidden' name='user_id' id ='user_id' value='{$user['user_id']}' />";
 		
 			echo "<table width='100%' id='configValues'>";
 
@@ -70,7 +71,7 @@
 						$disabledSelect = "disabled";
 					}
 					echo "	<select $disabledSelect name='plugin_id' id ='plugin_id' size='1' selectedIndex='-1'>";
-					echo "	  <option value='$plugin_id'>$plugin_description</option>";
+					echo "	  <option value='$plugin_id' '>$plugin_description</option>";
 					// select all available plugin-Types
 					$query = "SELECT * FROM ".$db_prefix."plugins where hidden='0' and plugin_type='device' ORDER BY type_int ASC";
 					$result = $mysqli->query($query);		
@@ -116,7 +117,7 @@
 						echo "<div class='btn-group'>";
 
 							$toggleClass = "";
-							if ($row['show_in_main'] == 1){
+							if ($row['show_in_main'] >= 1){
 								$toggleClass = "btn-success";
 							} else {
 								$toggleClass = "btn-warning";
@@ -176,6 +177,7 @@
 	$('#plugin_id').change(function () {
 	
 		var type_int = $(this).val();
+		var user_id = $('#user_id').val(); 
 		
 		if (type_int < 0) {
 			$('#configValues').find('tr:gt(1)').remove();		
@@ -191,10 +193,41 @@
 			jQuery.each(data , function(index, value){
 				var value_description = value.description;
 				var value_key = value.value_key;
-				var value_type = value.value_type;
+				var value_type_config = $.csv.toArray(value.value_type, {separator:';'});
+				var value_type = value_type_config[0];
 				var config_value = value.config_value;
 				var id = value.id;
-				if (value_type.toUpperCase() == "boolean".toUpperCase()) {
+				
+				if (value_type.toUpperCase() == "plugin".toUpperCase()) {
+					// get all configured plugin instances for this user
+					var plugin_type = value_type_config[1];
+					var plugin_name = value_type_config[2];	
+					$.getJSON("inc/plugins/getPluginInstances.php?type="+plugin_type+"&plugin_name="+plugin_name+"&user_id="+user_id, function(data1) {
+						var htmlElementSelect = "<select name='virtualdevice_value_"+id+"' id='virtualdevice_value_"+id+"'>";
+						if (config_value<0) {
+							htmlElementSelect += "<option value='-1' selected='selected'></option>";		
+						} else {
+							htmlElementSelect += "<option value='-1'></option>";
+						}
+						
+						
+						jQuery.each(data1 , function(index1, value1){
+							var plugin_description = value1.description;
+							var plugin_key = value1.id;
+							var selected = "";
+							if (plugin_key==config_value) {
+								selected = "selected='selected'"
+							}
+							htmlElementSelect += "<option value='"+plugin_key+"' "+selected+">"+plugin_description+"</option>";
+						});
+						
+						htmlElementSelect += "</select>";
+						
+						$('#configValues tr:last').after("<tr><td>"+value_description+"</td>"+
+								"<td>"+htmlElementSelect+"</td><td></td></tr>");
+					});
+					
+				} else if (value_type.toUpperCase() == "boolean".toUpperCase()) {
 					var selectedTrue, selectedFalse = 0;
 					if (config_value.toUpperCase() == "true".toUpperCase()) selectedTrue="selected='selected'";
 					if (config_value.toUpperCase() == "false".toUpperCase()) selectedFalse="selected='selected'";

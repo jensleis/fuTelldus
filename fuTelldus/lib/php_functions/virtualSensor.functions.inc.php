@@ -33,22 +33,30 @@
 		global $db_prefix;
 
 		$parameter = getPluginParameters($virtualSensorID);
-
+		
+		return getCurrentVirtualSensorStateWithParameter($virtualSensorID, $parameter);
+	}
+	
+	function getCurrentVirtualSensorStateWithParameter($virtualSensorID, $parameter) {
+		global $mysqli;
+		global $db_prefix;
+	
 		// find the script
 		$phpscript = getPluginPathToVSensorId($virtualSensorID);
-		
+	
 		$nameSpace = includePlugin($phpscript."/index.php");
-		$func = $nameSpace."\\getVirtualSensorVal";	
-		//include_once $phpscript."/index.php";		
+		$func = $nameSpace."\\getVirtualSensorVal";
+		//include_once $phpscript."/index.php";
 		$returnFromScript = @$func($parameter, $virtualSensorID);
-		
+	
 		// update last check
 		$lastUpdated = time();
 		$updateCheck = "update ".$db_prefix."virtual_sensors set last_check='".$lastUpdated."' WHERE id='".$virtualSensorID."'";
 		$mysqli->query($updateCheck);
-		
+	
 		return $returnFromScript;
 	}
+	
 	
 	// returns an array with arrays, containing the return-type and as sub-arrays
 	// the data found in the DB for this time range and maybe transformed by

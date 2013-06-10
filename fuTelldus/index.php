@@ -28,6 +28,7 @@
 	<link href="lib/packages/jquery-ui-1.10.2.custom/css/smoothness/jquery-ui-1.10.2.custom.min.css" rel="stylesheet">
 
 	<script src="lib/packages/timeago_jquery/jquery.timeago.js"></script>
+	<script src="lib/packages/jquery_csv/jquery_csv-0_71.min.js"></script>
 	<?php
 		if ($defaultLang == "no") echo "<script src=\"lib/packages/timeago_jquery/jquery.timeago.no.js\"></script>";
 	?>
@@ -53,7 +54,7 @@
 	<!-- For iPhone: -->
 	<link rel="apple-touch-icon-precomposed" href="images/thermometer.png">
 
-
+	<script src="lib/jscripts/futelldus_functions.js"></script>
 
 
 	<script type="text/javascript">

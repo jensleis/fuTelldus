@@ -110,9 +110,10 @@ CREATE TABLE IF NOT EXISTS `futelldus_sensors` (
   `editable` tinyint(4) NOT NULL,
   `monitoring` tinyint(4) NOT NULL,
   `public` tinyint(4) NOT NULL,
+  `show_in_main` tinyint(4) NOT NULL,
   PRIMARY KEY (`sensor_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
+-- ALTER TABLE futelldus_sensors ADD `show_in_main` tinyint(4) NOT NULL;
 
 -- --------------------------------------------------------
 

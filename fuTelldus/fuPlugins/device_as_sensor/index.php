@@ -38,7 +38,6 @@ namespace virtual_devices\device_as_sensor;
 		$myPath = getPluginPathToVSensorId($virtualSensorID);
 	
 		$widget = "";
-		$widget.="<div class='sensor-blocks well'>";
 
 			$widget.= "<div class='sensor-name'>";
 				$widget.= getVirtualSensorDescriptionToSensorId($virtualSensorID);
@@ -67,7 +66,6 @@ namespace virtual_devices\device_as_sensor;
 				}
 				
 				$widget.= "<abbr class=\"timeago\" title='".date("c", $timeUpdatedByInsertedLog)."'>".date("d-m-Y H:i", $timeUpdatedByInsertedLog)."</abbr>";
-			$widget.= "</div>";
 			$widget.= "</div>";	
 		
 		return $widget;
