@@ -182,7 +182,7 @@
 ?>
 
 <script type="text/javascript">
-	$('#plugin_id').change(function () {
+	$('#virtualsensor_type').change(function () {
 	
 		var type_int = $(this).val();
 		var user_id = $('#user_id').val(); 
@@ -191,7 +191,7 @@
 			$('#configValues').find('tr:gt(1)').remove();		
 		}
 		
-		var type_id = $('#virtual_device_id').val();
+		var type_id = $('#virtual_sensor_id').val();
 		
 		$.getJSON("inc/plugins/getPluginConfig.php?type_int="+type_int+"&plugin_id="+type_id, function(data) {
 			// remove all from 1 on
