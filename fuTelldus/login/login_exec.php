@@ -1,10 +1,6 @@
 <?php
 	
 	require("../lib/base.inc.php");
-
-
-
-
 	
 	// Set error to false
 	$error = false;
@@ -52,7 +48,6 @@
 		header("Location: index.php?msg=01&mail=".$_POST['mail']."&error=invalidSecureLogin");
 		exit();
 	}
-	
 	
 	
 	// Start logging in if all is good up to now!

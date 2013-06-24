@@ -30,4 +30,9 @@
 	error_reporting(E_ALL ^ E_NOTICE);
 	ini_set('include_path', '/www/fuTelldus/');
 	
+	define('DB_USERNAME', $username);
+	define('DB_PASSWORD', $password);
+	define('DB_NAME', $db_name);
+	define('DB_HOST', $host);
+
 ?>

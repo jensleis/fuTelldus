@@ -1,13 +1,15 @@
 <?php
 	error_reporting(E_ALL);
 	ini_set('display_errors', '1');	
+
+	require("lib/base.inc.php");
 	
 	ob_start();
 	session_start();
+	$_SESSION['batch']='cron_device_log';
 
 	/* Connect to database
 	--------------------------------------------------------------------------- */
-	require("lib/config.inc.php");
 
 	// Create DB-instance
 	$mysqli = new Mysqli($host, $username, $password, $db_name); 
@@ -96,4 +98,5 @@
 
     } //end-while-users
 
+    session_destroy(); 
 ?>

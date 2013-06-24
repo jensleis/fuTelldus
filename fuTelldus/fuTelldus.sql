@@ -20,8 +20,17 @@ SET time_zone = "+00:00";
 -- Database: `futelldus`
 --
 
--- --------------------------------------------------------
+--
+-- Tabellstruktur for tabell `futelldus_session`
+--
+CREATE TABLE `futelldus_sessions` (
+  `id` CHAR(32) NOT NULL,
+  `data` longtext NOT NULL,
+  `last_accessed` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+-- --------------------------------------------------------
 --
 -- Tabellstruktur for tabell `futelldus_config`
 --
@@ -293,6 +302,40 @@ CREATE TABLE IF NOT EXISTS `futelldus_virtual_sensors_log_values` (
   `value_key` varchar(256) NOT NULL,
   `value` varchar(256) NOT NULL,
   PRIMARY KEY (`log_id`, `value_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+--
+-- Tabellstruktur for tabell `futelldus_flows`
+--
+CREATE TABLE IF NOT EXISTS `futelldus_flows` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `type` varchar(256) NOT NULL,
+  `name` varchar(256) NOT NULL,
+  `chart` varchar(256) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Tabellstruktur for tabell `futelldus_scenes`
+--
+CREATE TABLE IF NOT EXISTS `futelldus_scenes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `name` varchar(256) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+--
+-- Tabellstruktur for tabell `futelldus_scenes_data`
+--
+CREATE TABLE IF NOT EXISTS `futelldus_scenes_data` (
+  `scene_id` int(11) NOT NULL AUTO_INCREMENT,
+  `type` varchar(256) NOT NULL,
+  `type_id` int(11) NOT NULL,
+  PRIMARY KEY (`scene_id`, `type`, `type_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --

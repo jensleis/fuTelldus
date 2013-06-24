@@ -1,9 +1,12 @@
 <?php
+	
+	
+	require_once "./lib/packages/openid/openid.php";
+	require ("lib/base.inc.php");
 	ob_start();
 	session_start();
 	
-	require_once "./lib/packages/openid/openid.php";
-
+	$_SESSION['batch']='telldus_auth';
 
 	$lightOpenID = new LightOpenID();
 	$lightOpenID->identity = 'http://login.telldus.com';
@@ -30,4 +33,5 @@
 		header('Location: '. $lightOpenID->authUrl(true) );
 	}
 
+	session_destroy(); 
 ?>

@@ -16,6 +16,8 @@ $lang = array(
 	"Lights" => "Devices",
 	"Settings" => "Settings",
 	"Log out" => "Log out",
+	"Events" => "Events",
+	"Flows" => "Flows",
 
 	"Page settings" => "Page settings",
 	"Users" => "Users",

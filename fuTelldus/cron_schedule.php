@@ -4,9 +4,10 @@
 	
 	/* Connect to database
 	--------------------------------------------------------------------------- */
-	require("lib/config.inc.php");
 	require("lib/base.inc.php");
 
+	$_SESSION['batch']='cron_schedule_log';
+	
 	// Create DB-instance
 	$mysqli = new Mysqli($host, $username, $password, $db_name); 
 

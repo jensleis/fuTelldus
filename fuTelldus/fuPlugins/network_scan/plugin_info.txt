@@ -2,4 +2,4 @@ name = Network scan
 author = Jens Leisenberg
 version = 1
 type = sensor
-description = Detects hosts in a network using NMAP and/or SNMP. It is also possible to detect smartphones.
+description = 'Detects hosts in a network using NMAP and/or SNMP. It is also possible to detect smartphones.'

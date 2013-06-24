@@ -2,4 +2,4 @@ name = Synology NAS control
 author = Jens Leisenberg
 version = 1
 type = device
-description = 'Sends a Synology NAS into a safe state where the power could hardly turnedd of. Benefit: If "restore on power loss" is activated, the NAS boot automatically when the power is back'
+description = 'Sends a Synology NAS into a safe state where the power could hardly turned of. Benefit: If "restore on power loss" is activated, the NAS boots automatically when the power is back'

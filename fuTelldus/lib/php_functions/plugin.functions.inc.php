@@ -2,6 +2,7 @@
 	
 	require ('virtualSensor.functions.inc.php');
 	require ('virtualDevice.functions.inc.php');
+	require ('actions.functions.inc.php');
 
 	// returns an array with all plugins. The array contains an array with 
 	// the plugin information from the plugin_info.txt

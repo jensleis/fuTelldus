@@ -1,13 +1,15 @@
 <?php
 	ob_start();
-	session_start();
 
 	/* Connect to database
 	--------------------------------------------------------------------------- */
-	require("lib/config.inc.php");
+	require("lib/base.inc.php");
 
+	session_start();
+	$_SESSION['batch']='wartung_delete_double_devices';
+	
 	// Create DB-instance
-	$mysqli = new Mysqli($host, $username, $password, $db_name); 
+	$mysqli = new Mysqli(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME); 
 
 	// Check for connection errors
 	if ($mysqli->connect_errno) {

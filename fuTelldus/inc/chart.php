@@ -4,50 +4,36 @@
 
 
 <?php
+
+	echo "<input type='hidden' id='user_id' value='".$user['user_id']."'/>";
+
     /* Headline
     --------------------------------------------------------------------------- */
     echo "<h3>{$lang['Charts']}</h3>";
 
-    /* Scenes - todo
+    /* Scenes
     --------------------------------------------------------------------------- */
-/*	echo "<fieldset>";
+	echo "<fieldset>";
 		echo "<legend>{$lang['Scenes']}</legend>";
 		echo "<table class='table table-striped table-hover'>";
 			echo "<thead class='hidden-phone'>";
 				echo "<tr>";
-					echo "<th>{$lang['Name']}</th>";
-					echo "<th>Included data</th>";
-					echo "<th width='15%' >Actions</th>";
+					echo "<th width='30%'>{$lang['Name']}</th>";
+					echo "<th width='55%'>Included data</th>";
+					echo "<th width='15%' ></th>";
 				echo "</tr>";
 			echo "</thead>";
 			
-			echo "<tbody>";
-				echo "<tr>";
-					echo "<td>Schlafzimmer mit Fenster</td>";
-					echo "<td>Schlafzimmer; Fenster</td>";
-					echo "<td>";
-						echo "<button class='btn btn-warning btn-mini' title='edit the scene'><i class='icon-white icon-pencil'></i></button>&nbsp;";
-						echo "<button class='btn btn-danger btn-mini' title='delete the scene'><i class='icon-white icon-trash'></i></button>&nbsp;";
-						echo "<button class='btn btn-info btn-mini' style='float:right' title='show the chart'><i class='icon-white icon-signal'></i></button>";
-					echo "</td>";
-				echo "</tr>";
-				echo "<tr>";
-					echo "<td>Jens@Home mit Pathfinder online</td>";
-					echo "<td>pathfinder online; Jens@Home</td>";
-					echo "<td>";
-						echo "<button class='btn btn-warning btn-mini' title='edit the scene'><i class='icon-white icon-pencil'></i></button>&nbsp;";
-						echo "<button class='btn btn-danger btn-mini' title='delete the scene'><i class='icon-white icon-trash'></i></button>&nbsp;";
-						echo "<button class='btn btn-info btn-mini' style='float:right' title='show the chart'><i class='icon-white icon-signal'></i></button>";
-					echo "</td>";
-				echo "</tr>";
+			echo "<tbody id='scene_table'>";
+				echo "<tr><td><img style='height:15px; margin-right:8px;' src='images/ajax-loader2.gif'/></td><td></td><td></td></tr>";
 			echo "</tbody>";
 		
 		echo "</table>";
 		
 	echo "<div style='text-align:right;'>";
-	echo "<a class='btn btn-primary' href='#'>Create scene</a>";		
+		echo "<button class='btn btn-primary showScene' href='#showScene' data-userid='".$user['user_id']."' data-type='scene' data-action='new' data-name='New scene'>Create scene</button>";		
 	echo "</div>";
-	echo "</fieldset>"; */
+	echo "</fieldset>"; 
 	
     /* Sensors
     --------------------------------------------------------------------------- */	
@@ -65,31 +51,24 @@
 			echo "<tbody>";
 			
 			
-			$query = "select s.name, s.sensor_id as id, 'sensor' as type, count(sl.time_updated)-1 as rows from ".$db_prefix."sensors s, ".$db_prefix."sensors_log sl 
-				where s.monitoring=1 and s.sensor_id=sl.sensor_id group by name, id, type
+			$query = "
+				select s.name, s.sensor_id as id, 'sensor' as type from ".$db_prefix."sensors s
+					where s.monitoring=1 and s.user_id='".$user['user_id']."'
 				union
-				select vs.description as name, vs.id as id, 'virtual' as type, count(vsl.time_updated)-1 as rows from ".$db_prefix."virtual_sensors vs, ".$db_prefix."virtual_sensors_log vsl 
-					where vs.monitoring=1 and vs.id=vsl.sensor_id group by name, id, type";
+				select vs.description as name, vs.id as id, 'virtual' as type from ".$db_prefix."virtual_sensors vs
+					where vs.monitoring=1 and vs.user_id='".$user['user_id']."'";
 			$result = $mysqli->query($query);
 			
 			while($row = $result->fetch_array()) {
 				echo "<tr>";
 					echo "<td>".$row['name']."</td>";
-					$activateChartButton = "";
-					if ($row['rows']>0) {
-						echo "<td><small><i>about ".$row['rows']." logs</i></small></td>";
-					} else {
-						echo "<td><small><i>no data</i></small></td>";
-						$activateChartButton = "disabled";
-					}
+					echo "<td><small class='count_log' id='count_".$row['type']."_".$row['id']."' data-id='".$row['id']."' data-type='".$row['type']."'></small></td>";
 					echo "<td>";
-					
 						$activateChartButton = "";
 						if ($row['type']=='virtual' and !isPluginProvidingCharts($row['id'])) {
 							$activateChartButton = "disabled";
 						}					
-						echo "<button class='btn btn-info btn-mini showChart $activateChartButton' $activateChartButton style='float:right' title='show the chart' href='#showChart' data-toggle='modal'\" data-name='".$row['name']."' data-id='".$row['id']."' data-type='".$row['type']."'>";
-						echo "<i class='icon-white icon-signal'></i></button>";
+						echo "<button class='btn btn-info btn-mini showScene $activateChartButton' $activateChartButton id='showChart_".$row['type']."_".$row['id']."' href='#showScene' style='float:right' data-action='showChart' data-id='".$row['id']."' data-name='".$row['name']."' data-type='".$row['type']."' title='show the chart'><i class='icon-white icon-signal'></i></button>";
 					echo "</td>";
 				echo "</tr>";
 			}
@@ -113,23 +92,16 @@
 			
 			echo "<tbody>";
 			
-			$query = "SELECT d.name, d.type as type, d.device_id as id, count(dl.time_updated)-1 as rows FROM ".$db_prefix."devices d, ".$db_prefix."devices_log dl where d.device_id = dl.device_id group by name, id, type";
+			$query = "SELECT d.name, d.type as type, d.device_id as id FROM ".$db_prefix."devices d where d.user_id='".$user['user_id']."'";
 			$result = $mysqli->query($query);
 			
 			while($row = $result->fetch_array()) {
 				echo "<tr>";
 					echo "<td>".$row['name']."</td>";
-					$activateChartButton = "";
-					if ($row['rows']>0) {
-						echo "<td><small><i>about ".$row['rows']." logs</i></small></td>";
-					} else {
-						echo "<td><small><i>no data</i></small></td>";
-						$activateChartButton = "disabled";
-					}
+					echo "<td><small class='count_log' id='count_".$row['type']."_".$row['id']."' data-id='".$row['id']."' data-type='".$row['type']."'></small></td>";
 					
 					echo "<td>";
-						echo "<button class='btn btn-info btn-mini showChart $activateChartButton' $activateChartButton style='float:right' title='show the chart' href='#showChart' data-toggle='modal'\" data-name='".$row['name']."' data-id='".$row['id']."' data-type='".$row['type']."'>";
-						echo "<i class='icon-white icon-signal'></i></button>";
+						echo "<button class='btn btn-info btn-mini showScene' href='#showScene' id='showChart_".$row['type']."_".$row['id']."' style='float:right' data-action='showChart' data-id='".$row['id']."' data-name='".$row['name']."' data-type='".$row['type']."' title='show the chart'><i class='icon-white icon-signal'></i></button>";
 					echo "</td>";
 				echo "</tr>";
 			}
@@ -139,23 +111,57 @@
 	echo "</fieldset>";
 ?>
 
-	<!-- The modal test dialog for notifications -->
-	<div class="modal fade" id="showChart">
-		<div class="modal-header">
+
+	
+	<!-- model dialog scenes-->
+	<div class="modal fade" id="showScene">
+		<div class="modal-header" id="modal-header-scene">
 			<a class="close" data-dismiss="modal">&times;</a>
-			<div class="header">
+			<div class="header" id="header-scene">
+				<h3 id="header-scene-text"></h3>
 			</div>
 		</div>
-		<div class="modal-body" style="text-align:center">
+		<div class="modal-body" id="modal-body-scene" style="text-align:left">
 		</div>
-		<div class="modal-footer">
-			<a href="#" class="btn" data-dismiss="modal"><?php echo $lang['Close'] ?></a>
+		<div class="modal-footer" id="modal-footer-scene">
+			<a href="#" class="btn btn-success" id='save_scene' onClick="javascript: saveScene();">Save</a>&nbsp;
+			<a href="#" class="btn btn-primary" data-dismiss="modal"><?php echo $lang['Close'] ?></a>
 		</div>
-	</div>
+	</div>	
 	
 <script type="text/javascript">	
-	$(document).on("click", ".showChart", function () {
-		$('#showChart').css({ //		.modal({backdrop: true,keyboard: true}).css({
+	$(function() {
+		// generate scene table
+		setSceneTable();
+	
+		$('.count_log').each(function(i, obj) {
+			var objID = $(obj).data('id');
+			var objType = $(obj).data('type');
+			$.ajax({
+			  url: "inc/charts/getCountLogs.php?id="+objID+"&type="+objType+"",
+			  dataType: "text",
+			  method: "get",
+			  cache: false,
+			  success: function(data) {
+				$(obj).hide();
+				if (data <= 0) {
+					var buttonID = '#showChart_'+objType+'_'+objID;
+					$(buttonID).attr('disabled', 'disabled');
+					$(obj).html("<i>no data</i>");
+					$(obj).fadeIn("normal");
+					
+				} else {
+					$(obj).html("<i>about "+data+" logs</i>");
+					$(obj).fadeIn("normal");
+				}
+				 
+			  },
+			});
+		});
+    });
+	
+	$(document).on("click", ".showScene", function () {
+		$('#showScene').css({ //		.modal({backdrop: true,keyboard: true}).css({
 		   'width': function () { 
 			   return ($(document).width() * .7) + 'px';  
 		   },
@@ -164,33 +170,247 @@
 		   }
 		});
 		
-		var sensorID = $(this).data('id');
+		var action = $(this).data('action');
 		var sensortype = $(this).data('type');
 		var sensorName = $(this).data('name');
+		var userID = $('#user_id').val();
 		
-		$(".header").html("<h3>"+sensorName+"</h3>");
-		$(".modal-body").css({'min-height': '500px'});
-		$(".modal-body").html("<img style='height:100px; margin-top:200px;' src='images/ajax-loader3.gif' alt='ajax-loader' />");
+		$("#header-scene-text").text(sensorName);
+		$("#modal-body-scene").css({'min-height': '520px'});
+		
+		var url ='';
+		var sceneID = -1;
+		var showMode=false;
+		if (action=='new') {
+			 url = 'inc/charts/getChartableItemsJSON.php?user_id='+userID;
+		} else if (action=='edit') {
+			sceneID = $(this).data('id');
+			url = 'inc/charts/getChartableItemsJSON.php?user_id='+userID+'&scene_id='+sceneID;
+		} else if (action=='showScene' || action=='showChart') {
+			sceneID = $(this).data('id');
+			showMode=true;
+			url = 'inc/charts/getChartableItemsJSON.php?user_id='+userID+'&scene_id='+sceneID;
+			
+		}
+		
+		$.getJSON(url, function(data) {
+		   var items = "";
+		   if (showMode){
+			   $("#modal-body-scene").html(""+
+					"		<div style='display:none;' id='sceneitemslist'>"+
+					"		</div>"+
+					"		<div class='' style='border:none' id='model-body-scene-content' style='min-height:500px'>"+
+					"		</div>");
+		   } else {
+			   $("#modal-body-scene").html("<div class='container-fluid'>"+
+					"<div class='row-fluid'>"+
+					"	<div class='span3 alert' id='modal-body-scene-nav' style='min-height:500px; max-height:500px; overflow: auto;'>"+
+					"		<li class='nav-header'>Name of the scene</li>"+
+					"		<input type='text' name='scene_name' id='scene_name' value='' data-id='"+sceneID+"' placeholder='Name of the scene'/>"+
+					"		<div style='overflow: auto;' id='sceneitemslist'>"+
+					"			<li class='nav-header'>Selected</li>"+
+					"		</div>"+
+					"	</div>"+
+					"	<div class='span9 ui-widget-content' style='border:none' id='model-body-scene-content' style='min-height:500px'>"+
+					"	</div>"+
+					"</div>"+
+				"</div>");
+		   }
+           
+			
+			// for scene get all selected scenes, for charts, selecth the given one		
+			if (action=='showChart') {
+				var htmlID = sensortype+"_"+sceneID;
+				var string = "<a href='#' class='badge toggleChartContent badge-warning' id='"+htmlID+"' name='"+htmlID+"' data-id='"+sceneID+"' data-type='"+sensortype+"' data-showInChart='true' style='width:80%'>"+sensorName+"</a>";
+				var item = $('<div/>').html(string).contents();
+				item.data('showInChart', 'true');
+				item.addClass('activatedClass');
+				
+				$('#sceneitemslist').append(item);
+			}
+			
+			// for scene get all selected scenes, for charts, selecth the given one		
+			if (action=='showScene' || action=='new' || action=='edit') {
+				$.each(data, function(index, value){
+					var htmlID = value.type+"_"+value.id;
+					
+					var activated = value.activated;
+					var showInChart='false';
+					var activatedClass='';
+					
+					if	(activated=='true'){
+						showInChart='true';
+						activatedClass='badge-warning';
+					}
+					
+					var string = "<a href='#' class='badge toggleChartContent "+activatedClass+"' id='"+htmlID+"' name='"+htmlID+"' data-id='"+value.id+"' data-type='"+value.type+"' data-showInChart='"+showInChart+"' style='width:80%'>"+value.name+"</a>";
+					var item = $('<div/>').html(string).contents();
+					item.data('showInChart', showInChart);
+					item.addClass('activatedClass');
+					
+					$('#sceneitemslist').append(item);
+				});
+			}
+			
+			if (action=='edit') {
+				$('#scene_name').val(sensorName);
+			}
+			
+			drawChart();
+        });
+		//$(".modal-body-scene").html("");
+		
+		$('#showScene').modal('show');
+	});
+	
+	$(document).on('click', '.toggleChartContent', function(event) {
+		var objectID = $(this).data('id');
+		var objectType = $(this).data('type');
+		var showInChart = $(this).data('showInChart');
+		if (typeof showInChart === "undefined" || showInChart=='false') {
+			$(this).data('showInChart', 'true');
+			$(this).addClass('badge-warning');
+		} else if (showInChart=='true'){
+			$(this).data('showInChart', 'false');
+			$(this).removeClass('badge-warning');
+		}
+		drawChart();
+	});	
+	
 
-		/*$.get("inc/charts/getChart.php?id="+sensorID+"&type="+sensortype+"&name="+sensorName+"", function(data) {
-		  $(".modal-body").html(data );
-		}).error(function(xhr, status, err) {
-		    $(".modal-body").html("<p>Error: Status = " + status + ", err = " + err + "</p>");
-		  });*/
+	function drawChart() {
+		var sceneDataArray = "[";
+		var first = true;
+		var count = 0;
+		$('.toggleChartContent').each(function(i, obj) {
+			var objectID = $(this).data('id');
+			var objectType = $(this).data('type');
+			var objectName = $(this).html();
+			var showInChart = $(this).data('showInChart');
+			if (showInChart=='true') {
+				if (first==false) {
+					sceneDataArray += ",";
+				} else {
+					first=false;
+				}
+				sceneDataArray += "{ \"type\":\""+objectType+"\", \"id\":\""+objectID+"\", \"name\":\""+objectName+"\"}";
+				count++;
+			}
+		});
+		sceneDataArray += "]";
 		
+		if (count>0) {
+			$.ajax({
+			  url: "inc/charts/getChart.php?data="+sceneDataArray,
+			  dataType: "text",
+			  method: "get",
+			  cache: false,
+			  success: function(data) {
+				$("#model-body-scene-content").html(data);
+			  },
+			  error: function(xhr, status, err) {
+				$("#model-body-scene-content").html("<p>Error: Status = " + status + ", err = " + err + "</p>");
+			  }
+			});
+		} else {
+			$("#model-body-scene-content").html("");
+		}
+		
+	}
+	
+	function setSceneTable() {
+			$(scene_table).html("<tr><td><img style='height:15px; margin-right:8px;' src='images/ajax-loader2.gif'/></td><td></td><td></td></tr>");
+			var userID = $('#user_id').val();
+			
+			$.getJSON('inc/charts/getScenesJSON.php?user_id='+userID, function(data) {
+				var content= "";
+			
+				$.each(data, function(index, value){
+					content+= "<tr>";
+					content+= "<td>"+value.name+"</td>";
+					content+= "<td>"+value.included+"</td>";
+					content+= "<td>";
+						content+= "<div style='float:right'>";
+							content+= "<button class='btn btn-warning btn-mini edit_scene showScene' href='#showScene' data-action='edit' data-id='"+value.id+"' data-name='"+value.name+"' title='edit the scene'><i class='icon-white icon-pencil'></i></button>&nbsp;";
+							content+= "<button class='btn btn-danger btn-mini delete_scene' data-id='"+value.id+"' title='delete the scene'><i class='icon-white icon-trash'></i></button>&nbsp;";
+							content+= "<button class='btn btn-info btn-mini showScene' href='#showScene' data-action='showScene' data-id='"+value.id+"' data-name='"+value.name+"' title='show the chart'><i class='icon-white icon-signal'></i></button>";
+						content+= "</div>";
+						
+					content+= "</td>";
+					content+= "</tr>";
+				});
+				
+				$(scene_table).hide();
+				$(scene_table).html(content);
+				$(scene_table).slideDown();
+			});
+	}
+	
+	function saveScene() {
+		var sceneName = $('#scene_name').val();
+		var sceneID = $('#scene_name').data('id');
+		var userID = $('#user_id').val();
+		
+		var sceneDataArray = "[";
+		var first = true;
+		$('.toggleChartContent').each(function(i, obj) {
+			var objectID = $(this).data('id');
+			var objectType = $(this).data('type');
+			var showInChart = $(this).data('showInChart');
+			if (showInChart=='true') {
+				if (first==false) {
+					sceneDataArray += ",";
+				} else {
+					first=false;
+				}
+				sceneDataArray += "{ \"type\":\""+objectType+"\", \"id\":\""+objectID+"\"}";
+			}
+		});
+		sceneDataArray += "]";
+		
+		var action = "";
+		if (sceneID<0) {
+			action='insert';
+		} else {
+			action='update';
+		}
 		$.ajax({
-		  url: "inc/charts/getChart.php?id="+sensorID+"&type="+sensortype+"&name="+sensorName+"",
+		  url: "inc/charts/saveScene.php?action="+action+"&id="+sceneID+"&userid="+userID+"&name="+sceneName+"&scenedata="+sceneDataArray+"",
 		  dataType: "text",
 		  method: "get",
 		  cache: false,
 		  success: function(data) {
-			$(".modal-body").html(data );
+			if (data==1) {
+				setSceneTable();
+				$('#showScene').modal('hide');
+			}
 		  },
 		  error: function(xhr, status, err) {
-		    $(".modal-body").html("<p>Error: Status = " + status + ", err = " + err + "</p>");
+			$("#model-body-scene-content").html("<p>Error: Status = " + status + ", err = " + err + "</p>");
 		  }
 		});
-		
-		
+	}
+	
+	$(document).on('keyup', '#scene_name', function(event) {
+		var val = $.trim( this.value );
+		$('#header-scene-text').text(val);
 	});
+	
+	$(document).on('click', '.delete_scene', function(event) {
+		var sceneID = $(this).data('id');
+		$.ajax({
+		  url: "inc/charts/saveScene.php?action=delete&id="+sceneID+"",
+		  dataType: "text",
+		  method: "get",
+		  cache: false,
+		  success: function(data) {
+			setSceneTable();
+		  },
+		  error: function(xhr, status, err) {
+			$(scene_table).html("<div class='alert alert-error'><b>Error! </b>"+err+"<br />Please reload the page</div>");
+		  }
+		});
+	});
+
+
 </script>

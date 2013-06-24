@@ -1,23 +1,19 @@
 <?php
+	require ("config.inc.php");
+	require_once ("session.class.php");
+	$session = new Session();
 	
 	ob_start();
 	session_start();
-
-
-
+	
 	/* Connect to DB and get config
 	--------------------------------------------------------------------------- */
-	require ("config.inc.php");
-
-
-
-
+	
+	
 	/* Connect to database
 	--------------------------------------------------------------------------- */
 	// Create DB-instance
-	$mysqli = new Mysqli($host, $username, $password, $db_name); 
-
-	 
+	$mysqli = new Mysqli(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME); 
 
 	// Check for connection errors
 	if ($mysqli->connect_errno) {
@@ -26,15 +22,6 @@
 	
 	// Set DB charset
 	mysqli_set_charset($mysqli, "utf8");
-
-
-
-
-
-
-	
-	
-	
 	
 	/* Include functions
 	--------------------------------------------------------------------------- */
@@ -42,10 +29,6 @@
 	require ('php_functions/datetime.functions.inc.php');
 	require ('php_functions/plugin.functions.inc.php');
 	require ('php_functions/telldus.functions.inc.php');
-	
-
-	
-	
 	
 	
 	/* Get URL

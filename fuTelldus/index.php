@@ -1,6 +1,7 @@
 <?php
 	require("lib/base.inc.php");
 	require("lib/auth.php");
+	
 
 	error_reporting(E_ALL);
 	ini_set('display_errors', '1');	
@@ -29,6 +30,9 @@
 
 	<script src="lib/packages/timeago_jquery/jquery.timeago.js"></script>
 	<script src="lib/packages/jquery_csv/jquery_csv-0_71.min.js"></script>
+	
+	
+	
 	<?php
 		if ($defaultLang == "no") echo "<script src=\"lib/packages/timeago_jquery/jquery.timeago.no.js\"></script>";
 	?>
@@ -104,6 +108,7 @@
 				    <li><a href='index.php'><?php echo $lang['Home']; ?></a></li>
 				    <li><a href='?page=sensors'><?php echo $lang['Sensors']; ?></a></li>
 				    <li><a href='?page=devices'><?php echo $lang['Lights']; ?></a></li>
+				    <li><a href='?page=flows'><?php echo $lang['Flows']; ?></a></li>
 				    <li><a href='?page=chart'><?php echo $lang['Chart']; ?></a></li>
 				    <li><a href='?page=settings'><?php echo $lang['Settings']; ?></a></li>
 				    <li class="divider"></li>
@@ -156,6 +161,7 @@
 								elseif (substr($_GET['page'], 0, 7) == "sensors") $navSensors_active = "active";
 								elseif (substr($_GET['page'], 0, 7) == "devices") $navDevices_active = "active";
 								elseif (substr($_GET['page'], 0, 5) == "chart") $navChart_active = "active";
+								elseif (substr($_GET['page'], 0, 6) == "flows") $navFlows_active = "active";
 								//elseif (substr($_GET['page'], 0, 6) == "report") $navReport_active = "active";
 								elseif (substr($_GET['page'], 0, 8) == "settings") $navSettings_active = "active";
 							?>
@@ -164,6 +170,7 @@
 							<li class="<?php echo $navMainpage_active; ?>"><a href="index.php"><?php echo $lang['Home']; ?></a></li>
 							<li class="<?php echo $navSensors_active; ?>"><a href="?page=sensors"><?php echo $lang['Sensors']; ?></a></li>
 							<li class="<?php echo $navDevices_active; ?>"><a href="?page=devices"><?php echo $lang['Lights']; ?></a></li>
+							<li class="<?php echo $navFlows_active; ?>"><a href="?page=flows"><?php echo $lang['Flows']; ?></a></li>
 							<li class="<?php echo $navChart_active; ?>"><a href="?page=chart"><?php echo $lang['Chart']; ?></a></li>
 							<li class='<?php echo $navSettings_active; ?>'><a href="?page=settings"><?php echo $lang['Settings']; ?></a></li>
 						</ul>

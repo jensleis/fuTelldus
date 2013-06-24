@@ -64,12 +64,21 @@
 	function getVirtualSensorChartData($virtualSensorID, $start, $end) {
 		// find the script
 		$phpscript = getPluginPathToVSensorId($virtualSensorID);
-		
-		// get the data from the DB
-		$chartData = getChartData($virtualSensorID, $start, $end);
-		
-		// if the plugin would like to change the data, the according function is called
 		$nameSpace = includePlugin($phpscript."/index.php");
+		
+		$funcGroup = $nameSpace."\\groupChartData";
+		// get the data from the DB
+		if (function_exists($funcGroup)) {
+			$returnFundGroup = @$funcGroup();
+			if (isset($returnFundGroup) and $returnFundGroup==true){
+				$chartData = getChartData($virtualSensorID, $start, $end, true);
+			} 
+		}else {
+			$chartData = getChartData($virtualSensorID, $start, $end, false);
+		}
+		
+
+		// if the plugin would like to change the data, the according function is called
 		$func = $nameSpace."\\editChartData";
 		$returnFromScript = @$func($virtualSensorID, $chartData);
 		
@@ -111,6 +120,23 @@
 		return $axisArray;
 	}
 	
+	function getVirtualSensorSeriesDisplay($virtualSensorID) {
+		global $mysqli;
+		global $db_prefix;
+		
+		$phpscript = getPluginPathToVSensorId($virtualSensorID);
+		$nameSpace = includePlugin($phpscript."/index.php");
+		$func = $nameSpace."\\addAxisConfigForView";
+		
+		$axisView = "";
+		if (function_exists($func)) {
+			$axisView = @$func();
+		}
+		
+		return $axisView;
+	}
+	
+	
 	// return true, if the plugin defines the function editChartData
 	// that means, that charts would be showable on the UI
 	function isPluginProvidingCharts($virtualSensorID) {
@@ -121,32 +147,37 @@
 	}
 	
 	// return an array with all returntypes of the virtual sensor and the requested data
-	function getChartData($virtualSensorID, $start, $end) {
+	function getChartData($virtualSensorID, $start, $end, $groupData) {
 		global $db_prefix;
 		global $mysqli;
 		
 		$range = $end - $start;
 
-		$rangeValue=86400; // bigger than half a year, dayily
-		if ($range <= 15778458) { // half year
-			$rangeValue=43200; // halfdays
+		if ($groupData){
+			$rangeValue=86400; // bigger than half a year, dayily
+			if ($range <= 15778458) { // half year
+				$rangeValue=43200; // halfdays
+			}
+			
+			if ($range <= 2629744) { // one month
+				$rangeValue=3600; // hour
+			}
+			
+			if ($range <= 604800) { // one week
+				$rangeValue=60;	//minute
+			}
+			
+			if ($range <= 86400) { // one day
+				$rangeValue=1;	// all
+			}
+			
+			if ($range <= 604800) { // one week
+				$rangeValue=1;	//all
+			}
+		} else {
+			$rangeValue=1;
 		}
 		
-		if ($range <= 2629744) { // one month
-			$rangeValue=3600; // hour
-		}
-		
-		if ($range <= 604800) { // one week
-			$rangeValue=60;	//minute
-		}
-		
-		if ($range <= 86400) { // one day
-			$rangeValue=1;	// all
-		}		
-		
-		if ($range <= 604800) { // one week
-			$rangeValue=1;	//all
-		}
 		
 		
 		// get all return types
@@ -307,4 +338,13 @@
 		return $phpscript['plugin_path'];
 	}	
 	
+	function getSensors($userID){
+		global $mysqli;
+		global $db_prefix;
+		
+		$query = "select vs.* from futelldus_virtual_sensors vs, futelldus_plugins p where p.type_int = vs.sensor_type and vs.user_id='".$userID."' order by vs.description asc";
+		$result = $mysqli->query($query);
+	
+		return $result;
+	}
 ?>

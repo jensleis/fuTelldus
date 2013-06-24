@@ -1,9 +1,13 @@
 <?php
-	ob_start();
-	session_start();
+
 
 	require_once 'lib/base.inc.php';
 	require_once 'HTTP/OAuth/Consumer.php';
+	
+	ob_start();
+	session_start();
+	
+	$_SESSION['batch']='getRequestToken';
 
 	$consumer = new HTTP_OAuth_Consumer($userTelldusConf['public_key'], $userTelldusConf['private_key']);
 
@@ -15,4 +19,5 @@
 	$url = $consumer->getAuthorizeUrl(constant('AUTHORIZE_TOKEN'));
 	header('Location:'.$url);
 
+	session_destroy(); 
 ?>

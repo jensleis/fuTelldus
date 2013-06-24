@@ -166,5 +166,10 @@ namespace virtual_devices\owl_energy_monitor;
 		return $returnValArr;
 	}
 
-	
+	// return true if the data should grouped according to the 
+	// time range selected in the chart to get a better performance
+	function groupChartData() {
+		return true;
+	}
+
 ?>

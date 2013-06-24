@@ -1,6 +1,6 @@
 <?php
 	
-	echo "<h4>".$lang['Virtual sensors']."</h4>";
+	echo "<h4>".$lang['Virtual devices']."</h4>";
 
 	/* Get parameters
 	--------------------------------------------------------------------------- */
@@ -12,24 +12,24 @@
 	/* Messages
 	--------------------------------------------------------------------------- */
 	if (isset($_GET['msg'])) {
-		if ($_GET['msg'] == 01) echo "<div class='alert alert-success'>{$lang['Virtual sensor added']}</div>";
-		if ($_GET['msg'] == 02) echo "<div class='alert alert-success'>{$lang['Virtual sensor deleted']}</div>";
+		if ($_GET['msg'] == 01) echo "<div class='alert alert-success'>{$lang['Virtual device added']}</div>";
+		if ($_GET['msg'] == 02) echo "<div class='alert alert-success'>{$lang['Virtual device deleted']}</div>";
 		if ($_GET['msg'] == 03) echo "<div class='alert alert-success'>{$lang['Data saved']}</div>";
-		if ($_GET['msg'] == 04) echo "<div class='alert alert-success'>{$lang['Virtual sensor updated']}</div>";
+		if ($_GET['msg'] == 04) echo "<div class='alert alert-success'>{$lang['Virtual device updated']}</div>";
 	}
 
 	$description = "";
-	$sensor_type = "-1";
-	$sensor_type_description = "";
+	$plugin_id = "-1";
+	$plugin_description = "";
 	if ($action == "edit") {
 		// load data
-		$query = "SELECT * FROM ".$db_prefix."virtual_sensors vs, ".$db_prefix."plugins vst where vs.sensor_type = vst.type_int and vs.id='$getID' LIMIT 1";
+		$query = "SELECT * FROM ".$db_prefix."virtual_devices vd, ".$db_prefix."plugins p where vd.plugin_id = p.type_int and vd.id='$getID' LIMIT 1";
 	    $result = $mysqli->query($query);
 	    $row = $result->fetch_array();
 		
 		$description = $row['description'];
-		$sensor_type = $row['sensor_type'];
-		$sensor_type_description = $row['type_description'];
+		$plugin_id = $row['plugin_id'];
+		$plugin_description = $row['type_description'];
 		
 		// load config data
 	}
@@ -38,27 +38,27 @@
 	/* Form
 	--------------------------------------------------------------------------- */
 	echo "<fieldset>";
-		echo "<legend>{$lang['Add virtual sensor']}</legend>";
+		echo "<legend>{$lang['Add virtual device']}</legend>";
 
 		
 			if ($action == "edit") {
 				echo "<div class='alert'>";
-				echo "<form action='?page=settings_exec&action=updateVirtualSensor&id=$getID' method='POST'>";
+				echo "<form action='?page=settings_exec&action=updateVirtualDevice&id=$getID' method='POST'>";
 			} else {
 				echo "<div class='well'>";
-				echo "<form action='?page=settings_exec&action=addVirtualSensor' method='POST'>";	
+				echo "<form action='?page=settings_exec&action=addVirtualDevice' method='POST'>";	
 			}		
 		
-			// add hidden field with actual virtual sensor id
-			echo "<input type='hidden' name='virtual_sensor_id' id ='virtual_sensor_id' value='$getID' />";
+			// add hidden field with actual virtual device id
+			echo "<input type='hidden' name='virtual_device_id' id ='virtual_device_id' value='$getID' />";
 			echo "<input type='hidden' name='user_id' id ='user_id' value='{$user['user_id']}' />";
-			
+		
 			echo "<table width='100%' id='configValues'>";
 
 				echo "<tr>";
 					echo "<td width='40%'>".$lang['Description']."</td>";
 					echo "<td>";
-						echo "<input style='width:180px;' type='text' name='virtualsensor_description' id='virtualsensor_description' value='$description' />";
+						echo "<input style='width:180px;' type='text' name='virtualdevice_description' id='virtualdevice_description' value='$description' />";
 					echo "</td>";					
 					echo "<td></td>";
 				echo "</tr>";
@@ -70,10 +70,10 @@
 					if ($action == "edit") {
 						$disabledSelect = "disabled";
 					}
-					echo "	<select $disabledSelect name='virtualsensor_type' id ='virtualsensor_type' size='1' selectedIndex='-1'>";
-					echo "	  <option value='$sensor_type'>$sensor_type_description</option>";
-					// select all available vSensor-Types
-					$query = "SELECT * FROM ".$db_prefix."plugins where hidden='0' and plugin_type='sensor' ORDER BY type_int ASC";
+					echo "	<select $disabledSelect name='plugin_id' id ='plugin_id' size='1' selectedIndex='-1'>";
+					echo "	  <option value='$plugin_id' '>$plugin_description</option>";
+					// select all available plugin-Types
+					$query = "SELECT * FROM ".$db_prefix."plugins where hidden='0' and plugin_type='device' ORDER BY type_int ASC";
 					$result = $mysqli->query($query);		
 					while($row = $result->fetch_array()) {
 						echo "	  <option value='".$row['type_int']."'>".$row['type_description']."</option>";
@@ -87,23 +87,22 @@
 			echo "</table>";
 			echo "<br/><div style='text-align:right;'>";
 			if ($action == "edit") {
-				echo "<a class='btn' href='?page=settings&view=virtualsensors'>{$lang['Cancel']}</a> &nbsp; ";
-				echo "<input class='btn btn-primary' type='submit' name='submit' value='".$lang['Update sensor']."'/>";		
+				echo "<a class='btn' href='?page=settings&view=virtualdevices'>{$lang['Cancel']}</a> &nbsp; ";
+				echo "<input class='btn btn-primary' type='submit' name='submit' value='".$lang['Update device']."'/>";		
 			} else {
-				echo "<input class='btn btn-primary' type='submit' name='submit' value='".$lang['Add sensor']."'/>";		
+				echo "<input class='btn btn-primary' type='submit' name='submit' value='".$lang['Add device']."'/>";		
 			}
 			echo "</div>";
 		echo "</form></div>";
 
 	echo "</fieldset>";
 
-	/* Virtual sensors
+	/* Virtual devices
 	--------------------------------------------------------------------------- */
 	echo "<fieldset>";
-		echo "<legend>{$lang['Sensors']}</legend>";
+		echo "<legend>{$lang['Devices']}</legend>";
 		
-		//$query = "SELECT * FROM ".$db_prefix."virtual_sensors WHERE user_id='{$user['user_id']}' ORDER BY description ASC";
-		$query = "SELECT * FROM ".$db_prefix."virtual_sensors s, ".$db_prefix."plugins st WHERE user_id='{$user['user_id']}' and st.type_int = s.sensor_type ORDER BY description ASC";
+		$query = "SELECT * FROM ".$db_prefix."virtual_devices vd, ".$db_prefix."plugins p WHERE user_id='{$user['user_id']}' and p.type_int = vd.plugin_id ORDER BY description ASC";
 	    $result = $mysqli->query($query);
 	    $numRows = $result->num_rows;
 
@@ -134,25 +133,19 @@
 							echo "</a>";
 
 							echo "<ul class='dropdown-menu'>";
-								if ($row['show_in_main'] >= 1)
-				    				echo "<li><a href='?page=settings_exec&action=putOnMainVirtualSensor&id={$row['id']}'>Remove from main</a></li>";
+								/*if ($row['show_in_main'] == 1)
+				    				echo "<li><a href='?page=settings_exec&action=putOnMainVirtualDevice&id={$row['id']}'>Remove from main</a></li>";
 				    			else
-				    				echo "<li><a href='?page=settings_exec&action=putOnMainVirtualSensor&id={$row['id']}'>Put on main</a></li>";
+				    				echo "<li><a href='?page=settings_exec&action=putOnMainVirtualDevice&id={$row['id']}'>Put on main</a></li>";*/
 				    			
-
-				    			if ($row['monitoring'] == 1)
-				    				echo "<li><a href='?page=settings_exec&action=setMonitoring&id={$row['id']}'>Disable monitoring</a></li>";
-				    			else
-				    				echo "<li><a href='?page=settings_exec&action=setMonitoring&id={$row['id']}'>Enable monitoring</a></li>";
-									
 								if ($row['online'] == 1)
-				    				echo "<li><a href='?page=settings_exec&action=setOnline&id={$row['id']}'>Set offline</a></li>";
+				    				echo "<li><a href='?page=settings_exec&action=setOnlineDevice&id={$row['id']}'>Set offline</a></li>";
 				    			else
-				    				echo "<li><a href='?page=settings_exec&action=setOnline&id={$row['id']}'>Set online</a></li>";	
+				    				echo "<li><a href='?page=settings_exec&action=setOnlineDevice&id={$row['id']}'>Set online</a></li>";	
 				    			
-								echo "<li><a href='?page=settings&view=virtualsensors&action=edit&id={$row['id']}'>Edit</a></li>";
+								echo "<li><a href='?page=settings&view=virtualdevices&action=edit&id={$row['id']}'>Edit</a></li>";
 								echo "<li class='divider'></li>";
-				    			echo "<li><a href='?page=settings_exec&action=deleteVirtualSensor&id={$row['id']}'>Delete</a></li>";
+				    			echo "<li><a href='?page=settings_exec&action=deleteVirtualDevice&id={$row['id']}'>Delete</a></li>";
 							echo "</ul>";
 						echo "</div>";
 
@@ -164,11 +157,10 @@
 		    			echo "<b>{$lang['Type']}:</b> ".$row['type_description']. "<br />";
 						//echo "<b>{$lang['Value']}:</b> ".$row["config_value"]. "<br />";
 		    			echo "<b>{$lang['Online']}:</b> ".$lang["boolean_".$row['online']]. "<br />";
-						echo "<b>{$lang['Monitor']}:</b> ".$lang["boolean_".$row['monitoring']]. "<br />";
 		    		echo "</div>";
 
 		    		echo "<div style='font-size:10px'>";
-		    			echo $lang["last check"].": ".ago(getLastVirtualSensorCheck($row['id']));
+		    			echo $lang["last switch"].": ".ago(getLastVirtualDeviceStatusSwitch($row['id']));
 		    		echo "</div>";
 
 		    	echo "</div>";
@@ -182,7 +174,7 @@
 ?>
 
 <script type="text/javascript">
-	$('#virtualsensor_type').change(function () {
+	$('#plugin_id').change(function () {
 	
 		var type_int = $(this).val();
 		var user_id = $('#user_id').val(); 
@@ -191,7 +183,7 @@
 			$('#configValues').find('tr:gt(1)').remove();		
 		}
 		
-		var type_id = $('#virtual_sensor_id').val();
+		var type_id = $('#virtual_device_id').val();
 		
 		$.getJSON("inc/plugins/getPluginConfig.php?type_int="+type_int+"&plugin_id="+type_id, function(data) {
 			// remove all from 1 on
@@ -211,7 +203,7 @@
 					var plugin_type = value_type_config[1];
 					var plugin_name = value_type_config[2];	
 					$.getJSON("inc/plugins/getPluginInstances.php?type="+plugin_type+"&plugin_name="+plugin_name+"&user_id="+user_id, function(data1) {
-						var htmlElementSelect = "<select name='virtualsensor_value_"+id+"' id='virtualsensor_value_"+id+"'>";
+						var htmlElementSelect = "<select name='virtualdevice_value_"+id+"' id='virtualdevice_value_"+id+"'>";
 						if (config_value<0) {
 							htmlElementSelect += "<option value='-1' selected='selected'></option>";		
 						} else {
@@ -239,9 +231,9 @@
 					var selectedTrue, selectedFalse = 0;
 					if (config_value.toUpperCase() == "true".toUpperCase()) selectedTrue="selected='selected'";
 					if (config_value.toUpperCase() == "false".toUpperCase()) selectedFalse="selected='selected'";
-					$('#configValues tr:last').after("<tr><td>"+value_description+"</td><td><select name='virtualsensor_value_"+id+"'><option value='true' "+selectedTrue+">true</option><option value='false' "+selectedFalse+">false</option></select</td><td></td></tr>");
+					$('#configValues tr:last').after("<tr><td>"+value_description+"</td><td><select name='virtualdevice_value_"+id+"'><option value='true' "+selectedTrue+">true</option><option value='false' "+selectedFalse+">false</option></select</td><td></td></tr>");
 				} else {
-					$('#configValues tr:last').after("<tr><td>"+value_description+"</td><td><input style='width:180px;' type='"+value_type+"' name='virtualsensor_value_"+id+"' id='virtualsensor_value_"+id+"' value='"+config_value+"' /></td><td></td></tr>");
+					$('#configValues tr:last').after("<tr><td>"+value_description+"</td><td><input style='width:180px;' type='"+value_type+"' name='virtualdevice_value_"+id+"' id='virtualdevice_value_"+id+"' value='"+config_value+"' /></td><td></td></tr>");
 				}
 			});
 		});

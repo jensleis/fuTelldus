@@ -150,7 +150,12 @@ namespace virtual_devices\network_scan;
 		$output = shell_exec($shellCommand);
 		
 		if (strlen(trim($output))>0) {
-			return $output;
+			if (startsWith($output, '1') == TRUE){
+				return 1;
+			} else {
+				return 0;
+			}
+			
 		}
 		return 0;
 	}
@@ -263,5 +268,70 @@ namespace virtual_devices\network_scan;
 	function startsWith($haystack, $needle) {
 		return !strncmp($haystack, $needle, strlen($needle));
 	}
+
+	// marks that the plugin is supporting charts
+	// maybe it will transform the data before it will be shown in
+	// UI
+	function editChartData($virtualSensorID, $chartDataArray) {
+		// round each value and convert it into Watt
+		$newChartDataArray = array();
+		while (list($returnKey, $returnValues) = each($chartDataArray)) { 
+			
+			//if returnKey == 'available' --> convert and round
+			if ($returnKey=='available') {
+				$first=true;
+				$lastValue = 0;
+				while (list($timestamp, $value) = each($returnValues)) { 
+					// add extra values to get the on and off-range correctly (last -1 millisecond with old state)
+					$timeJS = $sensorData["time_updated"] * 1000;
+					if (!$first) {
+						$timeEndLast = $timestamp - 1;
+						if ($lastValue != $value) {
+							$newChartDataArray[$returnKey][$timeEndLast] = $lastValue;
+							$newChartDataArray[$returnKey][$timestamp] = $value;
+						}
+						
+					} else {
+						$first=false;
+						$newChartDataArray[$returnKey][$timestamp] = $value;
+					}
+					
+					$lastValue = $value;
+				}
+				$newChartDataArray[$returnKey][time()] = $lastValue;
+			} 
+		}
+		return $newChartDataArray;
+	}
+
+	// chance to redefine the description and the suffix for the axis
+	// like they will shown on the UI
+	// --> iterate over the array, included is another array, keys:
+	// 0 --> position, don't change
+	// 1 --> description
+	// 2 --> suffix
+	function overwriteChartAxisDefinition($axisDefinition) {
+		$newAxisDefinition = array();
+		while (list($value_key, $configArray) = each($axisDefinition)) { 
+			if ($value_key == 'available') {
+				$configArray[2] = "";
+				$newAxisDefinition[$value_key] = $configArray;
+			}
+		}
+		return $newAxisDefinition;
+	}	
 	
+	// the value of the returning string will be added to the series 
+	// configuration of the HighCharts config Javascript array
+	// this is chance to add some configurations to change how
+	// the series will be painted 
+	function addAxisConfigForView() {
+		return "type: 'area',";
+	}
+	
+	// return true if the data should grouped according to the
+	// time range selected in the chart to get a better performance
+	function groupChartData() {
+		return false;
+	}
 ?>

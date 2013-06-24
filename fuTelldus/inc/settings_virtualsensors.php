@@ -211,7 +211,7 @@
 					var plugin_type = value_type_config[1];
 					var plugin_name = value_type_config[2];	
 					$.getJSON("inc/plugins/getPluginInstances.php?type="+plugin_type+"&plugin_name="+plugin_name+"&user_id="+user_id, function(data1) {
-						var htmlElementSelect = "<select name='virtualdevice_value_"+id+"' id='virtualdevice_value_"+id+"'>";
+						var htmlElementSelect = "<select name='virtualsensor_value_"+id+"' id='virtualsensor_value_"+id+"'>";
 						if (config_value<0) {
 							htmlElementSelect += "<option value='-1' selected='selected'></option>";		
 						} else {
@@ -239,9 +239,9 @@
 					var selectedTrue, selectedFalse = 0;
 					if (config_value.toUpperCase() == "true".toUpperCase()) selectedTrue="selected='selected'";
 					if (config_value.toUpperCase() == "false".toUpperCase()) selectedFalse="selected='selected'";
-					$('#configValues tr:last').after("<tr><td>"+value_description+"</td><td><select name='virtualdevice_value_"+id+"'><option value='true' "+selectedTrue+">true</option><option value='false' "+selectedFalse+">false</option></select</td><td></td></tr>");
+					$('#configValues tr:last').after("<tr><td>"+value_description+"</td><td><select name='virtualsensor_value_"+id+"'><option value='true' "+selectedTrue+">true</option><option value='false' "+selectedFalse+">false</option></select</td><td></td></tr>");
 				} else {
-					$('#configValues tr:last').after("<tr><td>"+value_description+"</td><td><input style='width:180px;' type='"+value_type+"' name='virtualdevice_value_"+id+"' id='virtualdevice_value_"+id+"' value='"+config_value+"' /></td><td></td></tr>");
+					$('#configValues tr:last').after("<tr><td>"+value_description+"</td><td><input style='width:180px;' type='"+value_type+"' name='virtualsensor_value_"+id+"' id='virtualsensor_value_"+id+"' value='"+config_value+"' /></td><td></td></tr>");
 				}
 			});
 		});

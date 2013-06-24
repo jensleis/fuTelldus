@@ -18,8 +18,7 @@
 	mysqli_set_charset($mysqli, "utf8");
 	
 	// get parameter
-	$id = clean($_GET['id']);
-	$type = clean($_GET['type']);
+	if (isset($_GET['data'])) $data = clean($_GET['data']);
 
 	$callback = $_GET['callback'];
 	if (!preg_match('/^[a-zA-Z0-9_]+$/', $callback)) {
@@ -57,22 +56,38 @@
 	
 	/* Generate the chart
 	-------------------------------------------------------*/
-	if ($type == "sensor") {
-		$rows = getSensorChartJSON($id, $name, $start, $end);
-		header('Content-Type: text/javascript');
-		echo $callback ."([\n" . $rows ."\n]);";
-	}
+	$rows =  generateSceneChart($data, $start, $end);
+	header('Content-Type: text/javascript');
+	echo $callback ."([\n" . $rows ."\n]);";
 	
-	if ($type == "virtual") {
-		$rows = generateVirtualSensorChart($id, $name, $start, $end);
-		header('Content-Type: text/javascript');
-		echo $callback ."([\n" . $rows ."\n]);";
-	}
-	
-	if ($type == "device") {
-		$rows =  generateDeviceChart($id, $name, $start, $end);
-		header('Content-Type: text/javascript');
-		echo $callback ."([\n" . $rows ."\n]);";
+	function generateSceneChart($data, $start, $end) {
+		$scenes = json_decode($data);
+		$concatedRows = "";
+		$first = true;
+		foreach ($scenes as $scene) {
+			$sensorID = $scene->id;
+			$sensorType = $scene->type;
+			$sensorName = $scene->name;
+			if ($first) {
+				$first=false;
+			} else {
+				$concatedRows = $concatedRows.",";
+			}
+			if ($sensorType == 'sensor') {
+				$concatedRows = $concatedRows . getSensorChartJSON($sensorID, $sensorName, $start, $end);
+			}
+			
+			if ($sensorType == 'device') {
+				$concatedRows = $concatedRows . "[ " . generateDeviceChart($sensorID, $sensorName, $start, $end). " ]";
+			}
+			
+			if ($sensorType == 'virtual') {
+				$concatedRows = $concatedRows . generateVirtualSensorChart($sensorID, $sensorName, $start, $end);
+			}
+			
+		}
+
+		return $concatedRows;
 	}
 
 	// returns an array in array with the return-type definied by the plugin

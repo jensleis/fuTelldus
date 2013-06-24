@@ -1,6 +1,4 @@
 <?php
-	
-	
 	function getVirtualDeviceDescriptionToDeviceId($deviceID) {
 		global $mysqli;
 		global $db_prefix;
@@ -85,5 +83,15 @@
 		$result = $mysqli->query($query);
 		$phpscript = $result->fetch_assoc();
 		return $phpscript['plugin_path'];
-	}	
+	}
+	
+	function getDevices($userID){
+		global $mysqli;
+		global $db_prefix;
+		
+		$query = "select vd.* from futelldus_virtual_devices vd, futelldus_plugins p where p.type_int = vd.plugin_id and vd.user_id='".$userID."' order by vd.description asc";
+		$result = $mysqli->query($query);
+		
+		return $result;
+	}
 ?>
