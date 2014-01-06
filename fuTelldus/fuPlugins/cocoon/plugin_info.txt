@@ -1,0 +1,5 @@
+name = Cocoon control
+author = Jens Leisenberg
+version = 1
+type = device
+description = 'Turns Cocoon radio on and off'
