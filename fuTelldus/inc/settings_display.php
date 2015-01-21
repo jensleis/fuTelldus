@@ -97,9 +97,11 @@ $(function() {
 		var showFor=$("#inputShowFor").val();
 		var refreshAfter=$("#inputRefreshAfter").val();
 		var device=$("#selectDevice").val();
-// 		var html=Base64.encode($("#inputHTML").val());
-// 		var html = Base64.encode(codeEditor.getValue());
-		var html = codeEditor.getValue();
+		if (type=='sensor') {
+			var html = codeEditor.getValue();
+		} else if (type=='device') {
+			var html = "{{state}}";
+		}
 		
 		var reqCurrent = $("#selectCurrent").prop('checked');
 		if (reqCurrent) {
@@ -161,18 +163,19 @@ $(function() {
 
 		if (selected=='device') {
 			$("#showForRow").hide();
-			$("#requestCurrentRow").hide();
 		} else if (selected=='sensor') {
 			$("#showForRow").show();
-			$("#requestCurrentRow").show();
 		}
 		
 		
 		$("#placeholders").html("");
 		$("#selectDevice").val("");
+		$("#requestCurrentRow").hide();
 		$("#deviceHTMLOptions").hide();
 	});
 
+
+	
 	// event for change type combo
 	$("#selectDevice").change(function() {
 		$("#wait").show();
@@ -182,8 +185,12 @@ $(function() {
 		var type = $("#type").val();
 		if (type == 'device') {
 			$("#selectDeviceLabel").html("Device");
+			$("#requestCurrentRow").hide();
+			$("#deviceHTMLOptions").hide();
 		} else if (type == 'sensor') {
 			$("#selectDeviceLabel").html("Sensor");
+			$("#requestCurrentRow").show();
+			$("#deviceHTMLOptions").show();
 		}
 
 		if (id!='') {
@@ -195,15 +202,29 @@ $(function() {
 		
 					var jsonResult = jQuery.parseJSON(returnVal);
 					var placeholder = "";
+					$("#controlArea").html("");
 					$.each(jsonResult, function(key, value){
 						var description = value.description;
-						placeholder += key+" : " + description +"<br />";			    
+						placeholder += key+" : " + description +"<br />";
+
+						// for preview page
+						var controlAreaInput = "<div class='row'  style='margin-top:15px'>"+
+							"<label class='control-label col-md-3' for='placeholder_"+key+"'>"+key+"</label>"+
+							"<div class='input-group col-md-5'>"+
+							"	<input type='text' class='form-control placeholderInput' data-key='"+key+"' id='placeholder_"+key+"'/>"+
+							"</div>"+
+							"<div class='input-group col-md-4'></div>"+
+							"</div>";
+					
+						$("#controlArea").append(controlAreaInput);			    
 					});
 
 					$("#placeholders").html(placeholder);
-							
+
+					// append apply-button to preview
+					$("#controlArea").append("<br /><a id='applyValuesBtn' class='btn btn-success' style='margin-right:15px'>Apply</a>");
+					
 					$("#wait").hide();
-					$("#deviceHTMLOptions").show();
 				}
 			});
 		} else {
@@ -326,12 +347,24 @@ $(function() {
 
 	$(document).on("click", "#previewBtn", function () {
 		$("#header-scene-text").text("Preview");
-		$("#modal-body-scene").css("min-height", 240); // 520
+		$("#modal-body-scene").css("min-height", $(window).height() - 250); // 520
 		$("#deviceHTML").html(codeEditor.getValue());
 		$("#deviceName").html($("#inputDescription").val());
 		
 		$('#sohwDialog').modal('show');
 	});
+
+	$( document ).on( 'click', '#applyValuesBtn', function () {
+		$(".placeholderInput").each(function() {
+			var key = $(this).data("key");
+			var value = $(this).val();
+			if (value.length>0) {
+				var newText = $("#deviceHTML").html().replace("{{"+key+"}}", value)
+				$("#deviceHTML").html(newText);
+			}
+		});
+	});
+	
 });
 
 
@@ -475,12 +508,12 @@ $(function() {
 								</div>
 							</div>
 							
-							<div class="row" style="margin-top:30px; float:right">
+							
+						</div>
+						<div class="row" style="margin-top:30px; float:right">
 								<a id="previewBtn" href="#sohwDialog" class='btn btn-success' style="margin-right:15px">Preview</a>
 								<a id="savePageBtn" class='btn btn-primary' style=>Save Page</a>	
 							</div>
-						</div>
-						
 					</div>
 				</form>
 			</div>
@@ -490,7 +523,7 @@ $(function() {
 
 <div class="modal modal-wide fade" id="sohwDialog">
 		<div class="modal-dialog">
-			<div class="modal-content" style="max-width:320px !important">
+			<div class="modal-content" style="">
 				<div class="modal-header" id="modal-header-scene">
 					<a class="close" data-dismiss="modal">&times;</a>
 					<div class="header" id="header-scene">
@@ -499,24 +532,31 @@ $(function() {
 				</div>
 				<div class="modal-body" id="modal-body-scene" style="text-align:left">
 				
-					<div id="sensorContent" style="height:100%;">
-					<div class="row" id="deviceNameRow">
-						<div class="col-xs-12 col-md-12" style="text-align:center">
-							<h4 id="deviceName"></h4>
-						</div>
-					</div>
-					<div class="row" style="" id="deviceHTMLRow">
-							<div class="overlay" id="prevPage" style="width:50%">
-				            </div>
-				            <div class="overlay" id="nextPage" style="width:50%">
-				            </div>
-							<div class="col-xs-12 col-md-12" style="height:100%;text-align:left;margin:0px;padding:0px;">
-								<div class="container-fluid" id="deviceHTML" style="height:100%;max-height:100%">
+				
+					<div class="container-fluid">
+				
+						<div class="col-md-6" id="previewArea" style="height:240px;width:320px;border: solid 1px">
+							<div id="sensorContent" style="height:100%;">
+							<div class="row" id="deviceNameRow">
+								<div class="col-xs-12 col-md-12" style="text-align:center">
+									<h4 id="deviceName"></h4>
 								</div>
 							</div>
+							<div class="row" style="" id="deviceHTMLRow">
+									<div class="col-xs-12 col-md-12" style="height:100%;text-align:left;margin:0px;padding:0px;">
+										<div class="container-fluid" id="deviceHTML" style="height:100%;max-height:100%">
+										</div>
+									</div>
+							</div>
+							</div>
+						</div>
+						
+						<div class="col-md-6" id="controlArea">
+							
+							
+							
+						</div>
 					</div>
-				</div>
-				
 				
 				</div>
 				<div class="modal-footer" id="modal-footer-scene">

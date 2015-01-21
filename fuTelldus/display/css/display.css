@@ -55,3 +55,27 @@ html * {
  .navmenu-default .navmenu-nav > li > a:hover, .navbar-default .navbar-offcanvas .navmenu-nav > li > a:hover, .navmenu-default .navmenu-nav > li > a:focus, .navbar-default .navbar-offcanvas .navmenu-nav > li > a:focus{
     background-color: #777 !important;
 }
+
+.displayDeviceBox {
+	text-align:center;
+	-webkit-border-radius: 8;
+	-moz-border-radius: 8;
+	border-radius: 4px;
+	padding: 10px;
+	border: solid #ffffff 1px;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.displayDeviceDescription {
+	display: inline-block;
+	vertical-align: middle;
+	float: none;
+	font-weight:bold;
+}
+
+.displayDeviceStatusPicture {
+	display: inline-block;
+	vertical-align: middle;
+	float: none;margin:5px
+}

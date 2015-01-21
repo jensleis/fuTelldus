@@ -63,6 +63,7 @@ if (isset($_GET['device'])){
 
 
 <script src="../../lib/jscripts/futelldus_functions.js"></script>
+<script src="../../lib/jscripts/futelldus_devices.js"></script>
 
 
 

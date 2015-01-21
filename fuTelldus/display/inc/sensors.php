@@ -13,6 +13,7 @@ $deviceResult = $result->fetch_assoc();
 
 <script type="text/javascript">
 var timerID;
+var xhr;
 
 window.onerror = function myErrorHandler(errorMsg, url, lineNumber) {
 	$("#wait").hide();
@@ -27,6 +28,8 @@ window.onerror = function myErrorHandler(errorMsg, url, lineNumber) {
 $(function() {
 	loadNextPage();
 
+	calculateSensorHTMLHeight();
+	
 	$("#refreshAfter").change( function() {
 		var refreshAfter = $("#refreshAfter").val()*1000;
 // 		var showForLeft = $("#showForLeft").val()*1000;
@@ -54,22 +57,45 @@ $(function() {
 
 
 	$("#nextPage").click(function () {
+		clearDisplayForAction();
 		loadNextPage();
 	});
 
 	$("#prevPage").click(function () {
+		clearDisplayForAction();
 		loadPrevPage();
 	});
 });
 
+function clearDisplayForAction() {
+	clearTimeout(timerID);
+	abortRunningCall();
+	
+	$("#sensorName").hide();
+	$("#sensorHTML").hide();
+
+	calculateSensorHTMLHeight();
+}
+
+function abortRunningCall() {
+	$("#wait").hide();
+	if (xhr!=null) {
+		try {
+			xhr.abort();
+		} catch (error) {
+		}
+	}
+}
+
 function calculateSensorHTMLHeight() {
 	var contentHeight = $("#sensorContent").outerHeight();
 	var nameHeight = $("#sensorNameRow").outerHeight();
-	var newHtmlHeight = contentHeight - nameHeight;
-
+	var buttonRowHeight = $("#buttonRow").outerHeight();
+	var newHtmlHeight = contentHeight - nameHeight - buttonRowHeight;
+	
 	$("#sensorHTMLRow").height(newHtmlHeight);
 
-	$("#nextPage").css("left", ($("#prevPage").width()));
+// 	$("#nextPage").css("left", ($("#prevPage").width()));
 	
 }
 
@@ -80,7 +106,7 @@ function refreshCurrentPage() {
 	var page_id=$("#currentPageID").val();
 
 
-	$.ajax( "../api/register/getPage.php?device_id="+device_id+"&type=sensor&pageaction=current&currentpageid="+page_id)
+	xhr = $.ajax( "../api/register/getPage.php?device_id="+device_id+"&type=sensor&pageaction=current&currentpageid="+page_id)
 	 .done(function(returnVal) {
 		var jsonResult = jQuery.parseJSON(returnVal);
 		$("#sensorName").html(jsonResult.description);
@@ -115,6 +141,10 @@ function loadNextPage() {
 
 		$("#refreshAfter").val(jsonResult.refreshAfter).change();
 
+		$("#sensorName").show();
+		$("#sensorHTML").show();
+		
+		
 		calculateSensorHTMLHeight();
 		
 		$("#wait").hide();
@@ -142,6 +172,10 @@ function loadPrevPage() {
 
 		$("#refreshAfter").val(jsonResult.refreshAfter).change();
 
+		$("#sensorName").show();
+		$("#sensorHTML").show();
+		
+		
 		calculateSensorHTMLHeight();
 		
 		$("#wait").hide();
@@ -163,13 +197,13 @@ function loadPrevPage() {
 		</div>
 	</div>
 	<div class="row" style="" id="sensorHTMLRow">
-			<div class="overlay" id="prevPage" style="width:50%">
-            </div>
-            <div class="overlay" id="nextPage" style="width:50%">
-            </div>
 			<div class="col-xs-12 col-md-12" style="height:100%;text-align:left;margin:0px;padding:0px;">
 				<div class="container-fluid" id="sensorHTML" style="height:100%;max-height:100%">
 				</div>
 			</div>
+	</div>
+	<div class="row" id="buttonRow" style="padding-bottom:10px">
+		<i id='prevPage' class='icon-chevron-left' style='margin-right:15px;cursor: pointer;padding-left:30px;padding-right:30px'></i>
+		<i id='nextPage' class='icon-chevron-right' style='margin-right:15px;cursor: pointer;padding-left:30px;padding-right:30px'></i>
 	</div>
 </div>
