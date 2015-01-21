@@ -1,0 +1,57 @@
+@CHARSET "ISO-8859-1";
+
+@import url(http://fonts.googleapis.com/css?family=Lato:300);
+
+
+
+html,body{height:100%;}
+
+html * {
+	font-family: 'Lato', sans-serif;
+	color:white;
+	background-color:black;
+}
+
+.btn-white {
+  -webkit-border-radius: 4;
+  -moz-border-radius: 4;
+  border-radius: 4px;
+/*   color: #000000; */
+/*   background: #ffffff; */
+  color: #ffffff;
+  background: #000000;
+
+  padding: 10px 20px 10px 20px;
+  border: solid #000000 1px;
+  text-decoration: none;
+}
+
+.btn-white:hover {
+  background: #f0f0f0;
+  text-decoration: none;
+}
+
+.btn-block {
+	width:100%;
+}
+
+.overlay
+ {
+     position: absolute;
+     top: 0;
+     left: 0;
+     right: 0;
+     bottom: 0;
+     background-color: rgba(0, 0, 0, 0.0);
+     z-index: 9999;
+     color: white;
+     display: inline-block;
+ }
+
+ .navmenu-default .navmenu-nav > li > a, .navbar-default .navbar-offcanvas .navmenu-nav > li > a {
+ 	background-color:#f8f8f8;
+ }
+ 
+ .navmenu-default .navmenu-nav > li > a:hover, .navbar-default .navbar-offcanvas .navmenu-nav > li > a:hover, .navmenu-default .navmenu-nav > li > a:focus, .navbar-default .navbar-offcanvas .navmenu-nav > li > a:focus{
+    background-color: #777 !important;
+}

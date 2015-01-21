@@ -1,0 +1,47 @@
+@CHARSET "ISO-8859-1";
+
+@import url(http://fonts.googleapis.com/css?family=Lato:300);
+
+html,body{height:100%;}
+
+html * {
+	font-family: 'Lato', sans-serif;
+}
+
+body {
+/* 	background: -moz-linear-gradient(top, #00CCCC, #00FF99);	 */
+/* 	background:-webkit-gradient(linear,left top,left bottom,from(#00CCCC),to(#00FF99)); */
+}
+
+.btn-white {
+  -webkit-border-radius: 4;
+  -moz-border-radius: 4;
+  border-radius: 4px;
+  color: #000000;
+  background: #ffffff;
+  padding: 10px 20px 10px 20px;
+  border: solid #000000 1px;
+  text-decoration: none;
+}
+
+.btn-white:hover {
+  background: #f0f0f0;
+  text-decoration: none;
+}
+
+.btn-block {
+	width:100%;
+}
+
+.overlay
+ {
+     position: absolute;
+     top: 0;
+     left: 0;
+     right: 0;
+     bottom: 0;
+     background-color: rgba(0, 0, 0, 0.0);
+     z-index: 9999;
+     color: white;
+     display: inline-block;
+ }

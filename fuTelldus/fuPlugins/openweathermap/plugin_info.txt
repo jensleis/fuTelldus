@@ -1,0 +1,5 @@
+name = OpenWeatherMap Forecast
+author = Jens Leisenberg
+version = 1
+type = sensor
+description = 'Requests OpenWeatherMap weather forecast data'

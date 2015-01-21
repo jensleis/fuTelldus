@@ -1,0 +1,6 @@
+name = Telldus sensor
+author = Jens Leisenberg
+version = 1
+type = sensor
+user-settings-page = user_settings.php
+description = 'Creates a connection to the Telldus-Live API and add the ability to read sensor values from the Telldus-Live account'

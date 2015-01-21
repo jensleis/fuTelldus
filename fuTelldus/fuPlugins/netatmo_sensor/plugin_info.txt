@@ -1,0 +1,6 @@
+name = Netatmo sensor
+author = Jens Leisenberg
+version = 1
+type = sensor
+user-settings-page = user_settings.php
+description = 'Connects to an existing Netatmo account and reads the data trhough the API'

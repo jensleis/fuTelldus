@@ -1,0 +1,6 @@
+name = Telldus device
+author = Jens Leisenberg
+version = 1
+type = device
+user-settings-page = user_settings.php
+description = 'Creates a connection to the Telldus-Live API and add the ability to control devices from the Telldus-Live account'

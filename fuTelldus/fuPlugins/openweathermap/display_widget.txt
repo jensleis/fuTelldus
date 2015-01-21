@@ -1,0 +1,21 @@
+wetter widget display:
+
+<div style="text-align:center;">
+  <div style="font-size:0.7em;margin-bottom:15px">
+    {{date}}
+  </div>
+  <div class="col-xs-6" style="">
+    <i style="font-size:2em"
+       {{weather_icon}}<br ></i>
+    </i>
+    {{weather_description}}
+  </div>
+  <div class="col-xs-6" style="text-align:right;font-size:1.5em;font-weight:bold">
+    <span style="color:red">{{day_max}}</span> °C<br />
+    <span style="color:blue">{{day_min}}</span> °C
+  </div>
+  <div class="col-xs-12">
+    <i class="wi wi-strong-wind"></i>
+    {{wind_speed}} km/h
+  </div>
+</div>

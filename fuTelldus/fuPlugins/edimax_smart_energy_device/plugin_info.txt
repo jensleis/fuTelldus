@@ -1,0 +1,5 @@
+name = Edimax Smart Plug SP 2101W Device
+author = Jens Leisenberg
+version = 2
+type = device
+description = 'Turns smart plug on and off'

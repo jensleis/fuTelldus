@@ -1,0 +1,5 @@
+name = Edimax Smart Plug SP 2101W Sensor
+author = Jens Leisenberg
+version = 2
+type = sensor
+description = 'Returns power consumption of configured Edimax 2101W Smart Plug'
