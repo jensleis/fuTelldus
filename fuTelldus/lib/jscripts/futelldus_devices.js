@@ -19,14 +19,16 @@ function createXHRobjekt() {
 
 
 
-function deviceControl(state, deviceID) {
+function deviceControl(state, deviceID, userid) {
 	myXHRobjekt = createXHRobjekt(); 
 
 	if (myXHRobjekt) {
 		myXHRobjekt.onreadystatechange = function() {
 			if(ajaxRequest.readyState == 4){
 				var ajaxDisplay = document.getElementById('ajax_loader_' + deviceID);
-				if (ajaxRequest.responseText == "changed") {
+//				alert (ajaxRequest.responseText);
+				if (ajaxRequest.responseText.toLowerCase() == "changed".toLowerCase()
+						|| ajaxRequest.responseText.localeCompare("changed")) {
 					ajaxDisplay.innerHTML = "";	
 					
 					if (state == "on") {
@@ -46,7 +48,7 @@ function deviceControl(state, deviceID) {
 			}
 		}
 
-		url = "ajax_device_control.php?state=" + state + "&id=" + deviceID + "&&rand=" + Math.random()*9999;
+		url = "ajax_device_control.php?state=" + state + "&id=" + deviceID + "&userid="+userid+" &rand=" + Math.random()*9999;
 		ajaxRequest.open("GET", url, true);
 		ajaxRequest.send(null); 
 	}

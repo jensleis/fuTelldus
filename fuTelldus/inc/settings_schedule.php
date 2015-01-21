@@ -39,7 +39,11 @@
 	}
 
 
-
+	if (isset($_GET['msg'])) {
+		if ($_GET['msg'] == 01) echo "<div class='alert alert-info autohide'>".$lang['Data saved']."</div>";
+		elseif ($_GET['msg'] == 02) echo "<div class='alert alert-danger autohide'>".$lang['Deleted']."</div>";
+	}
+	
 	
 	echo "<h4>".$lang['Schedule']."</h4>";
 
@@ -49,23 +53,13 @@
 	echo "</div>";
 
 
-	if (isset($_GET['msg'])) {
-		if ($_GET['msg'] == 01) echo "<div class='alert alert-info'>".$lang['Data saved']."</div>";
-		elseif ($_GET['msg'] == 02) echo "<div class='alert alert-error'>".$lang['Deleted']."</div>";
-	}
-
-
-
-
-
-
 
 	/* Form
 	--------------------------------------------------------------------------- */
 	if ($action == "add" || $action == "edit") {
 
 		if ($action == "edit") {
-			echo "<div class='alert'>";
+			echo "<div class='alert alert-warning'>";
 			echo "<form action='?page=settings_exec&action=updateSchedule&id=$getID' method='POST'>";
 		} else {
 			echo "<div class='well'>";
@@ -82,7 +76,7 @@
 						$query = "SELECT * FROM ".$db_prefix."sensors WHERE user_id='".$user['user_id']."' AND monitoring='1' ORDER BY name ASC LIMIT 100";
 		   				$result = $mysqli->query($query);
 
-		   				echo "<select style='width:180px;' name='sensorID'>";
+		   				echo "<select class='form-control' style='width:180px;' name='sensorID'>";
 		   				while ($row = $result->fetch_array()) {
 		   					if ($sensorID == $row['sensor_id'])
 		   						echo "<option value='{$row['sensor_id']}' selected='selected'>{$row['sensor_id']}: {$row['name']}</option>";
@@ -100,7 +94,7 @@
 					echo "<td>{$lang['Type']}</td>";
 					echo "<td>";
 
-						echo "<select style='width:120px; margin-right:5px;' name='direction'>";
+						echo "<select class='form-control' style='width:120px; margin-right:5px;' name='direction'>";
 							if ($direction == "less") $directionSelectedLess = "selected='selected'";
 							if ($direction == "more") $directionSelectedMore = "selected='selected'";
 
@@ -108,9 +102,9 @@
 							echo "<option value='less' $directionSelectedLess>{$lang['Lower than']}</option>";
 						echo "</select>";
 
-						echo "<input style='width:30px; margin-right:5px;' type='text' name='warningValue' id='warningValue' value='$warning_value' />";
+						echo "<input class='form-control' style='width:50px; margin-right:5px;' type='text' name='warningValue' id='warningValue' value='$warning_value' />";
 
-						echo "<select style='width:120px;' name='type'>";
+						echo "<select class='form-control' style='width:120px;' name='type'>";
 							if ($type == "celsius") $typeSelectedCelsius = "selected='selected'";
 							if ($type == "humidity") $typeSelectedHumidity = "selected='selected'";
 
@@ -134,7 +128,7 @@
 
 
 
-				echo "<tr><td colspan='2'><h5>{$lang['Device action']}</h5></td></tr>"; // Headline
+				echo "<tr><td colspan='2'><h5><b>{$lang['Device action']}</b></h5></td></tr>"; // Headline
 
 
 				// Device
@@ -144,7 +138,7 @@
 						$query = "SELECT * FROM ".$db_prefix."devices WHERE user_id='".$user['user_id']."' ORDER BY name ASC LIMIT 100";
 		   				$result = $mysqli->query($query);
 
-		   				echo "<select style='width:250px;' name='deviceID'>";
+		   				echo "<select class='form-control' style='width:250px;' name='deviceID'>";
 		   					echo "<option value=''>-- {$lang['No device action']}</option>";
 
 			   				while ($row = $result->fetch_array()) {
@@ -157,7 +151,7 @@
 		   				echo "</select>";
 
 
-		   				echo "<select style='width:70px; margin-left:10px;' name='device_action'>";
+		   				echo "<select class='form-control' style='width:100px; margin-left:10px;' name='device_action'>";
 		   					echo "<option value='1'>{$lang['On']}</option>";
 		   					echo "<option value='0'>{$lang['Off']}</option>";
 		   				echo "</select>";
@@ -175,14 +169,14 @@
 
 
 
-				echo "<tr><td colspan='2'><h5>{$lang['Notifications']}</h5></td></tr>"; // Headline
+				echo "<tr><td colspan='2'><h5><b>{$lang['Notifications']}</b></h5></td></tr>"; // Headline
 
 
 				// Value
 				echo "<tr>";
 					echo "<td>{$lang['Repeat every']}</td>";
 					echo "<td>";
-						echo "<input style='width:35px;' type='text' name='repeat' id='repeat' value='$repeat_alert' /> {$lang['minutes']}";
+						echo "<input class='form-control' style='width:55px;' type='text' name='repeat' id='repeat' value='$repeat_alert' /> {$lang['minutes']}";
 					echo "</td>";
 				echo "</tr>";
 
@@ -190,17 +184,17 @@
 				echo "<tr>";
 					echo "<td>{$lang['Send to']}</td>";
 					echo "<td><div class='row' style='padding-left:30px;padding-top:5px''>";
-						echo "<div class='span3'><label class='checkbox'>";
+						echo "<div class='col-md-3'><label class='checkbox'>";
 							if ($send_to_mail == 1) {
 								$sendToMailChecked = "checked='checked'";
 							} else {
 								$sendToMailChecked = "checked='unchecked'";
 							}
-					        echo "<input type='checkbox' name='sendTo_mail' value='1' $sendToMailChecked> {$lang['Email']}";
+					        echo "<input class='form-control' type='checkbox' name='sendTo_mail' value='1' $sendToMailChecked> {$lang['Email']}";
 						echo "</label></div>";	
-						echo "<div class='span9'><label class='checkbox'>";
+						echo "<div class='col-md-9'><label class='checkbox'>";
 					    	if ($send_to_pushover == 1) $sendToPushoverChecked = "checked='checked'";
-					        echo "<input type='checkbox' name='sendTo_pushover' value='1' $sendToPushoverChecked> {$lang['Pushover']}";
+					        echo "<input class='form-control' type='checkbox' name='sendTo_pushover' value='1' $sendToPushoverChecked> {$lang['Pushover']}";
 					    echo "</label></div>";
 					echo "</div></td>";					
 				echo "</tr>";
@@ -210,7 +204,7 @@
 				echo "<tr>";
 					echo "<td>{$lang['Primary']} {$lang['Email']}</td>";
 					echo "<td>";
-						echo "<input style='width:350px;' type='text' name='mail_primary' id='repeat' value='$mail_primary' />";
+						echo "<input class='form-control' style='width:350px;' type='text' name='mail_primary' id='repeat' value='$mail_primary' />";
 					echo "</td>";
 				echo "</tr>";
 
@@ -218,7 +212,7 @@
 				echo "<tr>";
 					echo "<td>{$lang['Secondary']} {$lang['Email']}</td>";
 					echo "<td>";
-						echo "<input style='width:350px;' type='text' name='mail_secondary' id='repeat' value='$mail_secondary' />";
+						echo "<input class='form-control' style='width:350px;' type='text' name='mail_secondary' id='repeat' value='$mail_secondary' />";
 					echo "</td>";
 				echo "</tr>";
 
@@ -228,7 +222,7 @@
 				echo "<tr>";
 					echo "<td colspan='2'>";
 						echo "<div style='text-align:right;'>";
-							if ($action == "edit") echo "<a class='btn' href='?page=settings&view=schedule'>{$lang['Cancel']}</a> &nbsp; ";
+							if ($action == "edit") echo "<a class='btn btn-default' href='?page=settings&view=schedule'>{$lang['Cancel']}</a> &nbsp; ";
 							echo "<input class='btn btn-primary' type='submit' name='submit' value='".$lang['Save data']."' />";
 						echo "</div>";
 					echo "</td>";
@@ -350,7 +344,7 @@
     	echo "</table>";
     }
 
-    else echo "<div class='alert'>{$lang['Nothing to display']}</div>";
+    else echo "<div class='alert alert-warning' style='margin-top:30px'>{$lang['Nothing to display']}</div>";
 
 
 ?>

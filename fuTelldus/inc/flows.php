@@ -3,7 +3,7 @@
 	.drag {cursor:default;}
 	.dragged {cursor:default; display:block; float:left;}
 </style>
-<script src="../../lib/packages/jsPlumb/jquery.jsPlumb-1.4.1-all.js "></script>
+<script src="lib/packages/jsPlumb/jquery.jsPlumb-1.4.1-all.js "></script>
 <script>
 var elementID = 0;
 
@@ -47,8 +47,9 @@ $(document).ready(function () {
 	// add start element
 	var newElem = $('<span></span>');
 	newElem.attr('id', 'start_element');
-	newElem.addClass('alert').addClass('dragged').addClass('alert-error');
+	newElem.addClass('alert').addClass('dragged').addClass('alert-danger');
 	var uiOffset = $('#droppable-container').offset();
+// 	newElem.css( {position:"absolute", top: 15, left: 30});
 	newElem.css( {position:"absolute", top: uiOffset.top+15, left:uiOffset.left+15});
 	newElem.html("Start");
 	$stretch.append(newElem);
@@ -170,108 +171,120 @@ $(function() {
   </script>
   
 <?php
+	echo "<div class='hidden-xs' style='height:30px;'></div>";
+    
+	echo "<div class='col-md-1'></div>";
+	
+	echo "<div class='col-md-10'>";
     /* Headline
     --------------------------------------------------------------------------- */
-    echo "<h3>{$lang['Flows']}</h3>";
-    echo "<fieldset>";
-		echo "<legend>Existing flows</legend>";
-		echo "<table class='table table-striped table-hover'>";
-			echo "<thead class='hidden-phone'>";
-				echo "<tr>";
-					echo "<th width='50%'>Name</th>";
-					echo "<th width='35%'>Flow type</th>";
-					echo "<th width='15%' style='float:right'></th>";
-				echo "</tr>";
-			echo "</thead>";
-			
-			echo "<tbody>";
-			
-			
-			$query = "select * from ".$db_prefix."flows f
-				where f.user_id='".$user['user_id']."'";
-			$result = $mysqli->query($query);
-			
-			while($row = $result->fetch_array()) {
-				echo "<tr>";
-					echo "<td>".$row['name']."</td>";
-					echo "<td>".$row['type']."</td>";
-					echo "<td>";
-						echo "<div style='float:right'>";
-							echo "<button class='btn btn-warning btn-mini' title='edit the flow' ><i class='icon-white icon-pencil'></i></button>&nbsp;";
-							echo "<button class='btn btn-danger btn-mini' title='delete the flow' ><i class='icon-white icon-trash'></i></button>&nbsp;";
-						echo "</div>";
-					echo "</td>";
-				echo "</tr>";
-			}
-			
-			echo "</tbody>";
-		echo "</table>";
-		echo "<div style='text-align:right;'>";
-		echo "<a class='btn btn-primary' href='#'>Create flow</a>";		
-		echo "</div>";
-	echo "</fieldset>";
-
-    echo "<fieldset>";
-    echo "<legend>Flow data</legend>";
-        
-	    echo "<form action='?page=settings_exec&action=undefined' method='POST'>";
-		//echo "<div class='well'>";
-			echo "<div class='container-fluid well' >";
-				echo "<div class='row-fluid'>";
-					echo "<div class='span4'>";
-						echo "<label>Name of the flow</label>";
-						echo "<input type='text' name='flow_name' id='flow_name' value='' style='width:100%' placeholder='Name of the flow'/>";    
-					echo "</div>";
-					echo "<div class='span2 offset1'>";
-						echo "<label>Flow type</label>";
-						echo "<select>";
-							echo "<option selected='selected' value='-1'></option>";
-							echo "<option>Schedule</option>";
-							echo "<option>Event</option>";
-							echo "<option>Device</option>";
-							echo "<option>Sensor</option>";
-						echo "</select>";
-					echo "</div>";
-					echo "<div class='span2' style='float:right'>";
-						echo "<label>&nbsp;</label>";
-						echo "<input class='btn btn-success' type='submit' name='submit' value='Save' style='' />&nbsp;";
-						echo "<input class='btn btn-primary' type='submit' name='cancel' value='Cancel' style='' />";
-					echo "</div>";
-				echo "</div>";
-				echo "<div class='row-fluid' style='min-height:750px'>";
-					echo "<div class='span3'>";
-						
-						//echo "<ul class='nav nav-list'>";
-						echo "<li class='nav-header'>Devices</li>";
-						$devices = getDevices($user['user_id']);
-						while ($device = $devices->fetch_array()) {
-							echo "<div class='drag alert alert-success' id='device_".$device['id']."' data-id='".$device['id']."' data-type='device' name='device_".$device['id']."'>".$device['description']."</div>"; 
-						}
-						echo "<br />";
-						
-						
-						echo "<li class='nav-header'>Sensors</li>";
-						$sensors = getSensors($user['user_id']);
-						while ($sensor = $sensors->fetch_array()) {
-							echo "<div id='device_".$sensor['id']."' class='drag alert alert-info' data-id='".$sensor['id']."' data-type='sensor' name='device_".$sensor['id']."'>".$sensor['description']."</div>"; 
-						}
-						echo "<br />";
-						
-						
-						echo "<li class='nav-header'>Actions</li>";
-						$actions = getActions($user['user_id']);
-						foreach ($actions as &$action) {
-							echo "<div id='device_".$action['id']."' class='drag alert alert-warning' data-id='".$action['id']."' data-type='action' name='device_".$action['id']."'>".$action['description']."</div>"; 
-						}
-						//echo "</ul>";
-					echo "</div>";
+	    echo "<h3>{$lang['Flows']}</h3>";
+	    echo "<fieldset>";
+			echo "<legend>Existing flows</legend>";
+			echo "<div class='table-responsive'>";
+				echo "<table class='table table-striped'>";
+					echo "<thead class='hide-xs'>";
+						echo "<tr>";
+							echo "<th width='50%'>Name</th>";
+							echo "<th width='35%'>Flow type</th>";
+							echo "<th width='15%'></th>"; //style='float:right
+						echo "</tr>";
+					echo "</thead>";
 					
-					echo "<div class='span9' id='droppable-container-parent'>";
-						echo "<div class='ui-widget-content' id='droppable-container' ></div>";
+					echo "<tbody>";
+					
+					
+					$query = "select * from ".$db_prefix."flows f
+						where f.user_id='".$user['user_id']."'";
+					$result = $mysqli->query($query);
+					
+					while($row = $result->fetch_array()) {
+						echo "<tr>";
+							echo "<td>".$row['name']."</td>";
+							echo "<td>".$row['type']."</td>";
+							echo "<td>";
+								echo "<div style='float:right'>";
+									echo "<button class='btn btn-warning btn-xs' title='edit the flow' ><i class='glyphicon glyphicon-white glyphicon glyphicon-pencil'></i></button>&nbsp;";
+									echo "<button class='btn btn-danger btn-xs' title='delete the flow' ><i class='glyphicon glyphicon-white glyphicon glyphicon-trash'></i></button>&nbsp;";
+								echo "</div>";
+							echo "</td>";
+						echo "</tr>";
+					}
+					
+					echo "</tbody>";
+				echo "</table>";
+			echo "</div>";
+			echo "<div style='text-align:right;'>";
+			echo "<a class='btn btn-primary' href='#'>Create flow</a>";		
+			echo "</div>";
+		echo "</fieldset>";
+	
+	    echo "<fieldset>";
+	    echo "<legend>Flow data</legend>";
+	        
+		    echo "<form action='?page=settings_exec&action=undefined' method='POST'>";
+			//echo "<div class='well'>";
+				echo "<div class='container well' >";
+					echo "<div class='row' style='margin-bottom:15px'>";
+						echo "<div class='col-md-4'>";
+							echo "<label>Name of the flow</label>";
+							echo "<input id='flow_name' class='form-control' type='text' placeholder='Name of the flow' name='flow_name' />";
+// 							echo "<input type='text' name='flow_name' id='flow_name' value='' style='width:100%' placeholder='Name of the flow'/>";    
+						echo "</div>";
+						echo "<div class='col-md-2 col-md-offset-1'>";
+							echo "<label>Flow type</label>";
+							echo "<select class='form-control'>";
+								echo "<option selected='selected' value='-1'></option>";
+								echo "<option>Schedule</option>";
+								echo "<option>Event</option>";
+								echo "<option>Device</option>";
+								echo "<option>Sensor</option>";
+							echo "</select>";
+						echo "</div>";
+						echo "<div class='col-md-2 pull-right'>";
+							echo "<label>&nbsp;</label>";
+							echo "<input class='btn btn-default' type='submit' name='cancel' value='Cancel' style='' />";
+							echo "<input class='btn btn-success pull-right' type='submit' name='submit' value='Save' style='' />";
+						echo "</div>";
 					echo "</div>";
-				echo "</div>";
-			//echo "</div>";	
-	    echo "</form>";
-	    
-	echo "</fieldset>";
+					echo "<div class='row' style='min-height:750px'>";
+						echo "<div class='col-md-3' style='margin-top:15px'>";
+							
+							//echo "<ul class='nav nav-list'>";
+							echo "<div class='flow-nav-heading'>Devices</div>";
+// 							echo "<li class='nav-header'>Devices</li>";
+							$devices = getDevices($user['user_id']);
+							while ($device = $devices->fetch_array()) {
+								echo "<div class='drag alert alert-success' id='device_".$device['id']."' data-id='".$device['id']."' data-type='device' name='device_".$device['id']."'>".$device['description']."</div>"; 
+							}
+							echo "<br />";
+							
+							echo "<div class='flow-nav-heading'>Sensors</div>";
+// 							echo "<li class='nav-header'>Sensors</li>";
+							$sensors = getSensors($user['user_id']);
+							while ($sensor = $sensors->fetch_array()) {
+								echo "<div id='device_".$sensor['id']."' class='drag alert alert-info' data-id='".$sensor['id']."' data-type='sensor' name='device_".$sensor['id']."'>".$sensor['description']."</div>"; 
+							}
+							echo "<br />";
+							
+							echo "<div class='flow-nav-heading'>Actions</div>";
+// 							echo "<li class='nav-header'>Actions</li>";
+							$actions = getActions($user['user_id']);
+							foreach ($actions as &$action) {
+								echo "<div id='device_".$action['id']."' class='drag alert alert-warning' data-id='".$action['id']."' data-type='action' name='device_".$action['id']."'>".$action['description']."</div>"; 
+							}
+							//echo "</ul>";
+						echo "</div>";
+						
+						echo "<div class='col-md-9' id='droppable-container-parent'>";
+							echo "<div class='ui-widget-content' id='droppable-container' ></div>";
+						echo "</div>";
+					echo "</div>";
+				//echo "</div>";	
+		    echo "</form>";
+		    
+		echo "</fieldset>";
+	echo "</div>";
+	
+	echo "<div class='col-md-1'></div>";
 ?>

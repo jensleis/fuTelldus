@@ -22,37 +22,18 @@
 		$newCPassword = clean($_POST['newCPassword']);
 		$cryptPW = hash('sha256', $newPassword);
 
-		$selectChart = clean($_POST['selectChart']);
 
-		$syncTelldusLists = clean($_POST['syncTelldusLists']);
-		$public_key = clean($_POST['public_key']);
-		$private_key = clean($_POST['private_key']);
-		$token_key = clean($_POST['token_key']);
-		$token_secret_key = clean($_POST['token_secret_key']);
-
-	$pushover_key = clean($_POST['pushover_key']);
+		$pushover_key = clean($_POST['pushover_key']);
 	
 		// Insert user
 		$query = "INSERT INTO ".$db_prefix."users SET 
 					mail='".$inputEmail."', 
 					password='".$cryptPW."', 
 					admin='".$admin."', 
-					pushover_key='".$pushover_key."' 
-					chart_type='".$selectChart."'";
+					pushover_key='".$pushover_key."'";
 		$result = $mysqli->query($query);
 
 		$userID =  $mysqli->insert_id;
-
-		// Insert telldus config
-		$query = "INSERT INTO ".$db_prefix."users_telldus_config SET 
-					user_id='".$userID."', 
-					sync_from_telldus='".$syncTelldusLists."', 
-					public_key='".$public_key."', 
-					private_key='".$private_key."', 
-					token='".$token_key."',  
-					token_secret='".$token_secret_key."'";
-		$result = $mysqli->query($query);
-
 
 		// Redirect
 		header("Location: ?page=settings&view=users&msg=01");
@@ -71,18 +52,13 @@
 		// Get POST data
 		$inputEmail = clean($_POST['inputEmail']);
 		$language = clean($_POST['language']);
-		$admin = clean($_POST['admin']);
+		$admin = "0";
+		if (isset($_POST['admin'])) { 
+			$admin = clean($_POST['admin']);
+		}
 
 		$newPassword = clean($_POST['newPassword']);
 		$newCPassword = clean($_POST['newCPassword']);
-
-		$selectChart = clean($_POST['selectChart']);
-
-		$syncTelldusLists = clean($_POST['syncTelldusLists']);
-		$public_key = clean($_POST['public_key']);
-		$private_key = clean($_POST['private_key']);
-		$token_key = clean($_POST['token_key']);
-		$token_secret_key = clean($_POST['token_secret_key']);
 		
 		$pushover_key = clean($_POST['pushover_key']);
 		
@@ -92,23 +68,11 @@
 		$query = "UPDATE ".$db_prefix."users SET 
 					mail='".$inputEmail."', 
 					language='".$language."', 
-					chart_type='".$selectChart."',
-					pushover_key='".$pushover_key."' 
+					pushover_key='".$pushover_key."' ,
+					admin='".$admin."' 
 					WHERE user_id='".$getID."'";
 		$result = $mysqli->query($query);
-
-		// Update telldus config
-		$query = "REPLACE INTO ".$db_prefix."users_telldus_config SET 
-					user_id='".$user['user_id']."', 
-					sync_from_telldus='".$syncTelldusLists."', 
-					public_key='".$public_key."', 
-					private_key='".$private_key."', 
-					token='".$token_key."',  
-					token_secret='".$token_secret_key."'";
-		$result = $mysqli->query($query);
-
-
-
+		
 		// Update password
 		if (!empty($newPassword)) {
 
@@ -143,55 +107,10 @@
 		$query = "DELETE FROM ".$db_prefix."users WHERE user_id='".$getID."'";
 		$result = $mysqli->query($query);
 
-		$query = "DELETE FROM ".$db_prefix."users users_telldus_config user_id='".$getID."'";
-		$result = $mysqli->query($query);
-
 		// Redirect
 		header("Location: ?page=settings&view=users&msg=03");
 		exit();
 	}
-
-
-
-	/* Save telldus config
-	--------------------------------------------------------------------------- */
-	/*
-	if ($action == "saveTelldusConfig") {
-
-		// Get POST data
-		$public_key = clean($_POST['public_key']);
-		$private_key = clean($_POST['private_key']);
-		$token_key = clean($_POST['token_key']);
-		$token_secret_key = clean($_POST['token_secret_key']);
-
-		if (!empty($public_key)) {
-			$query = "UPDATE ".$db_prefix."config SET config_value='".$public_key."' WHERE config_name LIKE 'telldus_public_key'";
-			$result = $mysqli->query($query);
-		}
-
-		if (!empty($private_key)) {
-			$query = "UPDATE ".$db_prefix."config SET config_value='".$private_key."' WHERE config_name LIKE 'telldus_private_key'";
-			$result = $mysqli->query($query);
-		}
-
-		if (!empty($token_key)) {
-			$query = "UPDATE ".$db_prefix."config SET config_value='".$token_key."' WHERE config_name LIKE 'telldus_token'";
-			$result = $mysqli->query($query);
-		}
-
-		if (!empty($token_secret_key)) {
-			$query = "UPDATE ".$db_prefix."config SET config_value='".$token_secret_key."' WHERE config_name LIKE 'telldus_token_secret'";
-			$result = $mysqli->query($query);
-		}
-
-
-		// Redirect
-		header("Location: ?page=settings&view=telldus_config&msg=01");
-		exit();
-
-	}
-	*/
-
 
 
 
@@ -207,20 +126,19 @@
 		$language = clean($_POST['language']);
 		$pushover_api_token = clean($_POST['pushover_api_token']);
 
-
-		$query = "UPDATE ".$db_prefix."config SET config_value='".$pageTitle."' WHERE config_name LIKE 'pagetitle'";
+		$query = "REPLACE INTO ".$db_prefix."config SET config_name='pagetitle', config_value='".$pageTitle."'";
 		$result = $mysqli->query($query);
 
-		$query = "UPDATE ".$db_prefix."config SET config_value='".$mail_from."' WHERE config_name LIKE 'mail_from'";
+		$query = "REPLACE INTO ".$db_prefix."config SET config_name='mail_from', config_value='".$mail_from."'";
 		$result = $mysqli->query($query);
 
-		$query = "UPDATE ".$db_prefix."config SET config_value='".$chart_max_days."' WHERE config_name LIKE 'chart_max_days'";
+		$query = "REPLACE INTO ".$db_prefix."config SET config_name='chart_max_days', config_value='".$chart_max_days."'";
 		$result = $mysqli->query($query);
 
-		$query = "UPDATE ".$db_prefix."config SET config_value='".$language."' WHERE config_name LIKE 'public_page_language'";
+		$query = "REPLACE INTO ".$db_prefix."config SET config_name='public_page_language', config_value='".$language."'";
 		$result = $mysqli->query($query);
 		
-		$query = "UPDATE ".$db_prefix."config SET config_value='".$pushover_api_token."' WHERE config_name LIKE 'pushover_api_token'";
+		$query = "REPLACE INTO ".$db_prefix."config SET config_name='pushover_api_token', config_value='".$pushover_api_token."'";
 		$result = $mysqli->query($query);
 
 
@@ -228,81 +146,6 @@
 		header("Location: ?page=settings&view=general&msg=01");
 		exit();
 
-	}
-
-
-
-	/* Add XML-shared sensor
-	--------------------------------------------------------------------------- */
-	if ($action == "addSensorFromXML") {
-		// Get POST data
-		$description = clean($_POST['description']);
-		$xml_url = clean($_POST['xml_url']);
-
-
-		// Insert telldus config
-		$query = "INSERT INTO ".$db_prefix."sensors_shared SET 
-					user_id='".$user['user_id']."', 
-					description='".$description."', 
-					url='".$xml_url."', 
-					disable='". 0 ."'";
-		$result = $mysqli->query($query);
-
-		// Redirect
-		header("Location: ?page=settings&view=share&msg=01");
-		exit();
-	}
-
-
-	/* Delete XML-shared sensor
-	--------------------------------------------------------------------------- */
-	if ($action == "deleteSensorFromXML") {
-		$query = "DELETE FROM ".$db_prefix."sensors_shared WHERE user_id='".$user['user_id']."' AND share_id='".$getID."'";
-		$result = $mysqli->query($query);
-
-		// Redirect
-		header("Location: ?page=settings&view=share&msg=02");
-		exit();
-	}
-
-
-	/* Put on main
-	--------------------------------------------------------------------------- */
-	if ($action == "putOnMainSensorFromXML") {
-
-		$getCurrentValue = getField("show_in_main", "".$db_prefix."sensors_shared", "WHERE share_id='".$getID."'");
-
-		if ($getCurrentValue == 0) {
-			$query = "UPDATE ".$db_prefix."sensors_shared SET show_in_main='1' WHERE user_id='".$user['user_id']."' AND share_id='".$getID."'";
-			$result = $mysqli->query($query);
-		} else {
-			$query = "UPDATE ".$db_prefix."sensors_shared SET show_in_main='0' WHERE user_id='".$user['user_id']."' AND share_id='".$getID."'";
-			$result = $mysqli->query($query);
-		}
-
-		// Redirect
-		header("Location: ?page=settings&view=share&msg=03");
-		exit();
-	}
-
-
-	/* Disable XML-shared sensor
-	--------------------------------------------------------------------------- */
-	if ($action == "disableSensorFromXML") {
-
-		$getCurrentValue = getField("disable", "".$db_prefix."sensors_shared", "WHERE share_id='".$getID."'");
-
-		if ($getCurrentValue == 0) {
-			$query = "UPDATE ".$db_prefix."sensors_shared SET disable='1' WHERE user_id='".$user['user_id']."' AND share_id='".$getID."'";
-			$result = $mysqli->query($query);
-		} else {
-			$query = "UPDATE ".$db_prefix."sensors_shared SET disable='0' WHERE user_id='".$user['user_id']."' AND share_id='".$getID."'";
-			$result = $mysqli->query($query);
-		}
-
-		// Redirect
-		header("Location: ?page=settings&view=share&msg=03");
-		exit();
 	}
 
 
@@ -544,7 +387,7 @@
 		$pushover_key = clean($_GET['pushover_key']);
 		$subject = clean($_GET['subject']);
 		$message = clean($_GET['message']);
-
+		
 		sendNotification($pushover_key, $subject, $message);
 		
 		// Redirect		
@@ -690,4 +533,30 @@
 		header("Location: ?page=settings&view=virtualdevices&msg=02");
 		exit();
 	}	
+	
+	
+	/* Save user plugin configuration
+	 --------------------------------------------------------------------------- */
+	if ($action == "savePluginUserConfig") {
+		$pluginID = clean($_GET['pluginID']);
+		
+		$pluginConfig = getPluginUserConfigArrayWithValues($getID, $pluginID);
+		foreach (array_keys($pluginConfig)  as $configKey) {
+			if (isset($_POST[$configKey])) {
+				$value = clean($_POST[$configKey]);
+				$config_id = $pluginConfig[$configKey]['id'];
+					
+				$query = "REPLACE INTO ".$db_prefix."plugins_user_config SET
+						user_id='".$user['user_id']."',
+						config_id='".$config_id."',
+						value='".$value."'";
+				$result = $mysqli->query($query);
+				
+			}
+		}
+	
+			// Redirect
+		header("Location: ?page=settings&view=plugin&action=edit&pluginID=".$pluginID."&msg=01");
+		exit();
+	}
 ?>

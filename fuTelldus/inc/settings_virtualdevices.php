@@ -1,5 +1,13 @@
 <?php
-	
+	/* Messages
+	 --------------------------------------------------------------------------- */
+	if (isset($_GET['msg'])) {
+		if ($_GET['msg'] == 01) echo "<div class='alert alert-success autohide'>{$lang['Virtual device added']}</div>";
+		if ($_GET['msg'] == 02) echo "<div class='alert alert-success autohide'>{$lang['Virtual device deleted']}</div>";
+		if ($_GET['msg'] == 03) echo "<div class='alert alert-success autohide'>{$lang['Data saved']}</div>";
+		if ($_GET['msg'] == 04) echo "<div class='alert alert-success autohide'>{$lang['Virtual device updated']}</div>";
+	}
+
 	echo "<h4>".$lang['Virtual devices']."</h4>";
 
 	/* Get parameters
@@ -8,15 +16,6 @@
 	$getID = "";
 	if (isset($_GET['id'])) $getID = clean($_GET['id']);
 	if (isset($_GET['action'])) $action = clean($_GET['action']);
-
-	/* Messages
-	--------------------------------------------------------------------------- */
-	if (isset($_GET['msg'])) {
-		if ($_GET['msg'] == 01) echo "<div class='alert alert-success'>{$lang['Virtual device added']}</div>";
-		if ($_GET['msg'] == 02) echo "<div class='alert alert-success'>{$lang['Virtual device deleted']}</div>";
-		if ($_GET['msg'] == 03) echo "<div class='alert alert-success'>{$lang['Data saved']}</div>";
-		if ($_GET['msg'] == 04) echo "<div class='alert alert-success'>{$lang['Virtual device updated']}</div>";
-	}
 
 	$description = "";
 	$plugin_id = "-1";
@@ -42,7 +41,7 @@
 
 		
 			if ($action == "edit") {
-				echo "<div class='alert'>";
+				echo "<div class='alert alert-warning'>";
 				echo "<form action='?page=settings_exec&action=updateVirtualDevice&id=$getID' method='POST'>";
 			} else {
 				echo "<div class='well'>";
@@ -52,13 +51,13 @@
 			// add hidden field with actual virtual device id
 			echo "<input type='hidden' name='virtual_device_id' id ='virtual_device_id' value='$getID' />";
 			echo "<input type='hidden' name='user_id' id ='user_id' value='{$user['user_id']}' />";
-		
+			
 			echo "<table width='100%' id='configValues'>";
 
 				echo "<tr>";
-					echo "<td width='40%'>".$lang['Description']."</td>";
-					echo "<td>";
-						echo "<input style='width:180px;' type='text' name='virtualdevice_description' id='virtualdevice_description' value='$description' />";
+					echo "<td width='25%'>".$lang['Description']."</td>";
+					echo "<td width='40%'>";
+						echo "<input class='form-control' type='text' name='virtualdevice_description' id='virtualdevice_description' value='$description' />";
 					echo "</td>";					
 					echo "<td></td>";
 				echo "</tr>";
@@ -70,7 +69,7 @@
 					if ($action == "edit") {
 						$disabledSelect = "disabled";
 					}
-					echo "	<select $disabledSelect name='plugin_id' id ='plugin_id' size='1' selectedIndex='-1'>";
+					echo "	<select class='form-control' $disabledSelect name='plugin_id' id ='plugin_id' size='1' selectedIndex='-1'>";
 					echo "	  <option value='$plugin_id' '>$plugin_description</option>";
 					// select all available plugin-Types
 					$query = "SELECT * FROM ".$db_prefix."plugins where hidden='0' and plugin_type='device' ORDER BY type_int ASC";
@@ -80,14 +79,17 @@
 					}
 					echo "	</select>";
 					echo "</td>";
-					
-					echo "<td></td>";	
+// 					echo "<div id='waitlogo'></div>";
+					echo "<td><div style='margin-left:15px' id='waitlogo'></div></td>";	
 				echo "</tr>";
 				
 			echo "</table>";
+			
+			
+			
 			echo "<br/><div style='text-align:right;'>";
 			if ($action == "edit") {
-				echo "<a class='btn' href='?page=settings&view=virtualdevices'>{$lang['Cancel']}</a> &nbsp; ";
+				echo "<a class='btn btn-default' href='?page=settings&view=virtualdevices'>{$lang['Cancel']}</a> &nbsp; ";
 				echo "<input class='btn btn-primary' type='submit' name='submit' value='".$lang['Update device']."'/>";		
 			} else {
 				echo "<input class='btn btn-primary' type='submit' name='submit' value='".$lang['Add device']."'/>";		
@@ -178,65 +180,110 @@
 	
 		var type_int = $(this).val();
 		var user_id = $('#user_id').val(); 
-		
-		if (type_int < 0) {
-			$('#configValues').find('tr:gt(1)').remove();		
-		}
-		
-		var type_id = $('#virtual_device_id').val();
-		
-		$.getJSON("inc/plugins/getPluginConfig.php?type_int="+type_int+"&plugin_id="+type_id, function(data) {
-			// remove all from 1 on
-			$('#configValues').find('tr:gt(1)').remove();
+
+		$('#configValues').find('tr:gt(1)').remove();
+		if (type_int >= 0) {
+			$('#waitlogo').html("<img style='height:15px; margin-right:8px;' src='images/ajax-loader2.gif'/>");
+					
+			var type_id = $('#virtual_device_id').val();
 			
-			// add all new
-			jQuery.each(data , function(index, value){
-				var value_description = value.description;
-				var value_key = value.value_key;
-				var value_type_config = $.csv.toArray(value.value_type, {separator:';'});
-				var value_type = value_type_config[0];
-				var config_value = value.config_value;
-				var id = value.id;
-				
-				if (value_type.toUpperCase() == "plugin".toUpperCase()) {
-					// get all configured plugin instances for this user
-					var plugin_type = value_type_config[1];
-					var plugin_name = value_type_config[2];	
-					$.getJSON("inc/plugins/getPluginInstances.php?type="+plugin_type+"&plugin_name="+plugin_name+"&user_id="+user_id, function(data1) {
-						var htmlElementSelect = "<select name='virtualdevice_value_"+id+"' id='virtualdevice_value_"+id+"'>";
-						if (config_value<0) {
-							htmlElementSelect += "<option value='-1' selected='selected'></option>";		
+			$.ajax({
+				url: "inc/plugins/getPluginConfig.php?type_int="+type_int+"&plugin_id="+type_id+"&configType=instance",
+				success: function(data) {
+					$('#configValues tr:last').after("<tr><td> </td><td><hr /></td><td></td></tr>"); 
+					
+					// add all new
+					jQuery.each(data , function(index, value){
+						var value_description = value.description;
+						var value_key = value.value_key;
+						var value_type_config = $.csv.toArray(value.value_type, {separator:';'});
+						var value_type = value_type_config[0];
+						var config_value = value.config_value;
+						var id = value.id;
+						
+						if (value_type.toUpperCase() == "plugin".toUpperCase()) {
+							// get all configured plugin instances for this user
+							var plugin_type = value_type_config[1];
+							var plugin_name = value_type_config[2];	
+							$.ajax({
+			 					url : "inc/plugins/getPluginInstances.php?type="+plugin_type+"&plugin_name="+plugin_name+"&user_id="+user_id, 
+			 					success : function(data1) {
+									var htmlElementSelect = "<select class='form-control' name='virtualdevice_value_"+id+"' id='virtualdevice_value_"+id+"'>";
+									if (config_value<0) {
+										htmlElementSelect += "<option value='-1' selected='selected'></option>";		
+									} else {
+										htmlElementSelect += "<option value='-1'></option>";
+									}
+									
+									
+									jQuery.each(data1 , function(index1, value1){
+										var plugin_description = value1.description;
+										var plugin_key = value1.id;
+										var selected = "";
+										if (plugin_key==config_value) {
+											selected = "selected='selected'"
+										}
+										htmlElementSelect += "<option value='"+plugin_key+"' "+selected+">"+plugin_description+"</option>";
+									});
+									
+									htmlElementSelect += "</select>";
+									
+									$('#configValues tr:last').after("<tr><td>"+value_description+"</td>"+
+											"<td>"+htmlElementSelect+"</td><td></td></tr>");
+			 					}, 
+			 					async: false,
+			 					dataType: 'json'
+		 					});	// end ajax
+						} else if (value_type.toUpperCase() == "boolean".toUpperCase()) {
+							var selectedTrue, selectedFalse = 0;
+							if (config_value.toUpperCase() == "true".toUpperCase()) selectedTrue="selected='selected'";
+							if (config_value.toUpperCase() == "false".toUpperCase()) selectedFalse="selected='selected'";
+							$('#configValues tr:last').after("<tr><td>"+value_description+"</td><td><select class='form-control' name='virtualdevice_value_"+id+"'><option value='true' "+selectedTrue+">true</option><option value='false' "+selectedFalse+">false</option></select</td><td></td></tr>");
+						} else if (value_type.toUpperCase() == "callBackMethodReturnList".toUpperCase()) {
+							var method = value_type_config[1];
+		
+		 					$.ajax({
+			 					url : "inc/plugins/executePluginCallBack.php?type="+type_int+"&method="+method+"&user_id="+user_id, 
+			 					success : function(data1) {
+			 						var htmlElementSelect = "<select class='form-control' name='virtualdevice_value_"+id+"' id='virtualdevice_value_"+id+"'>";
+			 						if (config_value<0) {
+			 							htmlElementSelect += "<option value='-1' selected='selected'></option>";		
+			 						} else {
+			 							htmlElementSelect += "<option value='-1'></option>";
+			 						}
+			 							
+			 							
+			 						jQuery.each(data1 , function(index1, value1){
+			 							var callBackID = value1.id;
+			 							var callBackValue = value1.name;
+			 							var selected = "";
+			 							if (callBackID==config_value) {
+			 								selected = "selected='selected'"
+			 							}
+			 							htmlElementSelect += "<option value='"+callBackID+"' "+selected+">"+callBackValue+"</option>";
+			 						});
+			 							
+			 						htmlElementSelect += "</select>";
+			 						
+			 						$('#configValues tr:last').after("<tr><td>"+value_description+"</td>"+
+			 								"<td>"+htmlElementSelect+"</td><td></td></tr>");
+			 					}, 
+			 					async: false,
+			 					dataType: 'json'
+		 					});	// end ajax
 						} else {
-							htmlElementSelect += "<option value='-1'></option>";
+							$('#configValues tr:last').after("<tr><td>"+value_description+"</td><td><input class='form-control' type='"+value_type+"' name='virtualdevice_value_"+id+"' id='virtualdevice_value_"+id+"' value='"+config_value+"' /></td><td></td></tr>");
 						}
-						
-						
-						jQuery.each(data1 , function(index1, value1){
-							var plugin_description = value1.description;
-							var plugin_key = value1.id;
-							var selected = "";
-							if (plugin_key==config_value) {
-								selected = "selected='selected'"
-							}
-							htmlElementSelect += "<option value='"+plugin_key+"' "+selected+">"+plugin_description+"</option>";
-						});
-						
-						htmlElementSelect += "</select>";
-						
-						$('#configValues tr:last').after("<tr><td>"+value_description+"</td>"+
-								"<td>"+htmlElementSelect+"</td><td></td></tr>");
 					});
 					
-				} else if (value_type.toUpperCase() == "boolean".toUpperCase()) {
-					var selectedTrue, selectedFalse = 0;
-					if (config_value.toUpperCase() == "true".toUpperCase()) selectedTrue="selected='selected'";
-					if (config_value.toUpperCase() == "false".toUpperCase()) selectedFalse="selected='selected'";
-					$('#configValues tr:last').after("<tr><td>"+value_description+"</td><td><select name='virtualdevice_value_"+id+"'><option value='true' "+selectedTrue+">true</option><option value='false' "+selectedFalse+">false</option></select</td><td></td></tr>");
-				} else {
-					$('#configValues tr:last').after("<tr><td>"+value_description+"</td><td><input style='width:180px;' type='"+value_type+"' name='virtualdevice_value_"+id+"' id='virtualdevice_value_"+id+"' value='"+config_value+"' /></td><td></td></tr>");
-				}
-			});
-		});
-	//});
+					$('#waitlogo').html("");
+				},
+				fail : function() {
+					$('#waitlogo').html("<img style='height:15px; margin-right:8px;' src='images/error.png'/>");
+				},
+				async: false,
+				dataType: 'json'
+			}); // end ajax
+		} // end if		
 	}).trigger('change');
 </script>

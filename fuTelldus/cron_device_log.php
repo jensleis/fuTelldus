@@ -27,7 +27,6 @@
 	require_once 'HTTP/OAuth/Consumer.php';
 
 
-
 	/* ##################################################################################################################### */
 	/* ######################################## SCRIPT RUNS BELOW THIS LINE ################################################ */
 	/* ##################################################################################################################### */
@@ -43,60 +42,47 @@
 
     	/* Connect to telldus
 		--------------------------------------------------------------------------- */
-    	$query2 = "SELECT * FROM ".$db_prefix."users_telldus_config WHERE user_id='{$row['user_id']}'";
-  		$result2 = $mysqli->query($query2);
-  		$telldusConf = $result2->fetch_array();
+    	$queryDevices = "SELECT * FROM ".$db_prefix."virtual_devices WHERE user_id='{$row['user_id']}'";
+  		$resultDevicesSet = $mysqli->query($queryDevices);
+  		
 
-  		// Define variables for oAuth
-		define('URL', 'http://api.telldus.com'); //https should be used in production!
-		define('REQUEST_TOKEN', constant('URL').'/oauth/requestToken');
-		define('AUTHORIZE_TOKEN', constant('URL').'/oauth/authorize');
-		define('ACCESS_TOKEN', constant('URL').'/oauth/accessToken');
-		define('REQUEST_URI', constant('URL').'/xml');
-
-		define('BASE_URL', 'http://'.$_SERVER["SERVER_NAME"].dirname($_SERVER['REQUEST_URI']));
-
-		
-		/* Get devices for user
-		--------------------------------------------------------------------------- */
-		$consumer = new HTTP_OAuth_Consumer($telldusConf['public_key'], $telldusConf['private_key'], $telldusConf['token'], $telldusConf['token_secret']);
-		$params = array('supportedMethods'=> 1023);
-		$response = $consumer->sendRequest(constant('REQUEST_URI').'/devices/list', $params, 'GET');
-		
-		$xmlString = $response->getBody();
-		$xmldata = new SimpleXMLElement($xmlString);
-		
-		$lastUpdated = time();
-		
-		foreach($xmldata->device as $deviceData) {
-			$deviceID = trim($deviceData['id']);
-			$name = trim($deviceData['name']);
-			$state = trim($deviceData['state']);
-			$statevalue = trim($deviceData['statevalue']);
-			$methods = trim($deviceData['methods']);
-			$type = trim($deviceData['type']);
-			$client = trim($deviceData['client']);
-			$clientName = trim($deviceData['clientName']);
-			$online = trim($deviceData['online']);
-			$editable = trim($deviceData['editable']);
+  		while ($device = $resultDevicesSet->fetch_array()) {
+//   			echo "<pre>";
+//   			print_r($device);
+//   			echo "</pre>";
+  			
+			$id = $device['id'];
+			$description = $device['description'];
+			$pluginID = $device['plugin_id'];
+// 			$lastStatus = $device['last_status'];
+			$online = $device['online'];
 			
-			$queryDevice = "select status from ".$db_prefix."devices_log where device_id = '".$deviceID."' order by time_updated desc limit 1";
-			$result3 = $mysqli->query($queryDevice);
-			$row = mysqli_fetch_row($result3);
-			$oldstatus = $row[0];
+			// get last state
+			$lastStatus = -1;
+			$queryLastState = "select status from ".$db_prefix."virtual_devices_log where device_id='".$id."' order by time_updated desc LIMIT 1";
+			$resultLastState = $mysqli->query($queryLastState);
+			if (mysqli_num_rows($resultLastState) == 1) {
+				$lastStatus = $resultLastState->fetch_assoc()['status'];
+			}
+// 			echo "selectedLastState ... ";
 			
-			// only update id value changed
-			if ($result3->num_rows<=0 or $oldstatus != $state) {
+			$currentState = getCurrentVirtualDeviceState($id, $row['user_id']);
+			// only update if value changed
+// 			echo "selectedCurrentState ... ";
+// 			echo $description." --- ".$lastStatus." --- ".$currentState;
+			
+			if ($currentState != $lastStatus) {
 				// Add values to DB
-				$queryInsert = "REPLACE INTO ".$db_prefix."devices_log SET 
-								device_id='". $deviceID ."', 
-								time_updated='". $lastUpdated ."', 
-								status='". $state ."'";
+				$queryInsert = "REPLACE INTO ".$db_prefix."virtual_devices_log SET
+								device_id='". $id ."',
+								time_updated='". time() ."',
+								status='". $currentState ."'";
 				$resultInsert = $mysqli->query($queryInsert);
-			}		
-		}
+			}
+			
+  		}
 
     } //end-while-users
 
-    session_destroy(); 
+//     session_destroy(); 
 ?>

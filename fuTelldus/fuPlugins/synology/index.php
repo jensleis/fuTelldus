@@ -30,11 +30,21 @@ namespace synology\owl_energy_monitor;
 	
 	function getConfigArray() {
 		return $configs = array(
-				'nas_ip' => array('IP of the NAS' => 'text'),
-				'nas_port' => array('SSH Port of the NAS' => 'text'),
-				'nas_admin_port' => array('Port of the admin-console' => 'text'),
-				'nas_username' => array('Username' => 'text'),
-				'nas_password' => array('Password' => 'password')
+				array('key' => 'nas_ip',
+						'type' => 'text',
+						'description' => 'IP of the NAS'),
+				array('key' => 'nas_port',
+						'type' => 'text',
+						'description' => 'SSH Port of the NAS'),
+				array('key' => 'nas_admin_port',
+						'type' => 'text',
+						'description' => 'Port of the admin-console'),
+				array('key' => 'nas_username',
+						'type' => 'text',
+						'description' => 'Username'),
+				array('key' => 'nas_password',
+						'type' => 'password',
+						'description' => 'Password')
 		);
 	}
 	
@@ -49,8 +59,8 @@ namespace synology\owl_energy_monitor;
 	
 	// should return 1 if the device is on and 0 if off
 	function getStatus($parameter, $deviceID) {
-		$host = $parameter['nas_ip'];
-		$adminport = $parameter['nas_admin_port'];
+		$host = $parameter['nas_ip']['value'];
+		$adminport = $parameter['nas_admin_port']['value'];
 		
 		$handle = curl_init($host);
 		curl_setopt($handle, CURLOPT_PORT, $adminport);
@@ -72,10 +82,10 @@ namespace synology\owl_energy_monitor;
 	// contains the logic to turn the device off
 	// return 1 on success, 0 on error
 	function switchOff($parameter, $deviceID) {
-		$host = $parameter['nas_ip'];
-		$sshport = $parameter['nas_port'];
-		$user = $parameter['nas_username'];
-		$password = $parameter['nas_password'];
+		$host = $parameter['nas_ip']['value'];
+		$sshport = $parameter['nas_port']['value'];
+		$user = $parameter['nas_username']['value'];
+		$password = $parameter['nas_password']['value'];
 		
 		$connection = ssh2_connect($host, $sshport);
 		ssh2_auth_password($connection, $user, $password);

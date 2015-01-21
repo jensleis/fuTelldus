@@ -97,14 +97,14 @@
 		global $db_prefix;	
 		
 		$offset = date('Z');
-		echo "/* timezone offset: ".$offset."\n*/";
+		echo "/* timezone offset: ".$offset.", id: ".$id."\n*/";
 		// calculate the correct offset to get ever 0am for the actual day
 		$end = $end - $offset + 86400;
-		
+		echo "/* end: ".$end."*/";
 		$chartDataArray = getVirtualSensorChartData($id, $start, $end);
 		// convert the chartDataArray into a highchart compatible array
 		// make sure, that all the values are at the correct position (given by parameter)
-
+		
 		// every axis
 		$returnArray = "";
 		$first = true;
@@ -136,7 +136,7 @@
 		$end = $end - $offset + 86400;
 	
 		$queryS = "
-			SELECT * FROM futelldus_devices_log
+			SELECT * FROM ".$db_prefix."virtual_devices_log
 					WHERE device_id={$id}
 					and time_updated between $start and $end
 					ORDER BY time_updated ASC
@@ -147,7 +147,6 @@
 		$temp_values = array();
 		$first=true;
         while ($sensorData = $resultS->fetch_array()) {
-		
 			// add extra values to get the on and off-range correctly (last -1 millisecond with old state)
 			$timeJS = $sensorData["time_updated"] * 1000;
 			if (!$first) {
@@ -159,7 +158,6 @@
 			
 			// convert status to 0 and 1 status
             $status = convertStatusToOnOff(trim($sensorData["status"]));
-			
             $temp_values[] = "[" . $timeJS . "," . $status . "]";
         }
 		
@@ -173,7 +171,7 @@
 	
 	function convertStatusToOnOff($status) {
 		$newstatus = 0;
-		if ($status > 1) {
+		if ($status >= 1) {
 			$newstatus = $status - floor($status);
 		} else {
 			$newstatus = 1;
@@ -217,7 +215,7 @@
 		$end = $end - $offset + 86400;
 
 		$queryS = "
-			SELECT UNIX_TIMESTAMP(FROM_UNIXTIME(time_updated)) as time_updated, ROUND(avg(temp_value),1) as temp_value, ROUND(avg(humidity_value),1) as humidity_value FROM futelldus_sensors_log 
+			SELECT UNIX_TIMESTAMP(FROM_UNIXTIME(time_updated)) as time_updated, ROUND(avg(temp_value),1) as temp_value, ROUND(avg(humidity_value),1) as humidity_value FROM ".$db_prefix."sensors_log 
 					WHERE sensor_id='{$id}'
 					and time_updated between $start and $end
 					GROUP BY FLOOR(time_updated / $rangeValue)

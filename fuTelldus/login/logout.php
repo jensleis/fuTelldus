@@ -4,7 +4,10 @@
 	require_once 'HTTP/OAuth/Consumer.php';
 	
 	unset($_SESSION['fuTelldus_user_loggedin']);
-
+	unset($_SESSION['token']);
+	
+	$_SESSION['token'] = null;
+	
 	setcookie("fuTelldus_user_loggedin", "", time()-3600);
 
 	session_destroy(); 

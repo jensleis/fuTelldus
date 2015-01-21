@@ -23,30 +23,18 @@
 
 	header('Content-Type: text/javascript');
 	$result = -1;
-	if ($objectType=='sensor'){
-		$result = getCountSensorLog($objectID);
-	} else if ($objectType=='device') {
+	if ($objectType=='device') {
 		$result = getCountDeviceLog($objectID);
 	} else if ($objectType=='virtual') {
 		$result = getCountVirtualSensorLog($objectID);
 	}
 	echo $result;
-
-	function getCountSensorLog($sensorID) {
-		global $mysqli;
-		global $db_prefix;	
-		
-		$query = "select count(sl.time_updated)-1 as rows from ".$db_prefix."sensors_log sl where sl.sensor_id='".$sensorID."'";
-		$result = $mysqli->query($query);
-		$count = $result->fetch_assoc()['rows'];
-		return $count;
-	}
 	
 	function getCountDeviceLog($deviceID) {
 		global $mysqli;
 		global $db_prefix;
 	
-		$query = "select count(dl.time_updated)-1 as rows from ".$db_prefix."devices_log dl where dl.device_id='".$deviceID."'";
+		$query = "select count(dl.time_updated)-1 as rows from ".$db_prefix."virtual_devices_log dl where dl.device_id='".$deviceID."'";
 		$result = $mysqli->query($query);
 		$count = $result->fetch_assoc()['rows'];
 		return $count;

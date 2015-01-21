@@ -473,7 +473,7 @@ pre .variable.global, pre .variable.class, pre .variable.instance {
   height: 16px;
 }
 
-[class^="icon-"], [class*=" icon-"] {
+[class^=".glyphicon .glyphicon-"], [class*=" .glyphicon .glyphicon-"] {
   display:inline-block;
   width:14px;
   height:14px;
@@ -484,6 +484,6 @@ pre .variable.global, pre .variable.class, pre .variable.instance {
   background-position:14px 14px;
   background-repeat:no-repeat;
 }
-[class^="icon-"]:last-child, [class*=" icon-"]:last-child { *margin-left:0; }
-.icon-arrow-left { background-position:-240px -96px; }
-.icon-arrow-right { background-position:-264px -96px; }
+[class^=".glyphicon .glyphicon-"]:last-child, [class*=" .glyphicon .glyphicon-"]:last-child { *margin-left:0; }
+..glyphicon .glyphicon-arrow-left { background-position:-240px -96px; }
+..glyphicon .glyphicon-arrow-right { background-position:-264px -96px; }

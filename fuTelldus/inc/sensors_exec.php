@@ -7,56 +7,27 @@
 
 	
 
-	/* add sensor
-	--------------------------------------------------------------------------- */
-	if ($action == "addSensor") {
-
-		$query = "UPDATE ".$db_prefix."sensors SET monitoring='". 1 ."' WHERE sensor_id='".$getID."'";
-		$result = $mysqli->query($query);
+	/*
+	 --------------------------------------------------------------------------- */
+	if ($action == "setMonitoring") {
+		$getCurrentValue = getField("monitoring", "".$db_prefix."virtual_sensors", "WHERE id='".$getID."'");
+		$returnStateMessage="";
+		
+		if ($getCurrentValue == 0) {
+			$query = "UPDATE ".$db_prefix."virtual_sensors SET monitoring='1' WHERE user_id='".$user['user_id']."' AND id='".$getID."'";
+			$result = $mysqli->query($query);
+			$returnStateMessage="01";
+		} else {
+			$query = "UPDATE ".$db_prefix."virtual_sensors SET monitoring='0' WHERE user_id='".$user['user_id']."' AND id='".$getID."'";
+			$result = $mysqli->query($query);
+			$returnStateMessage="02";
+		}
 
 		// Redirect
-		header("Location: ?page=sensors&msg=01");
+		header("Location: ?page=sensors&msg=".$returnStateMessage);
 		exit();
 	}
 
-
-	/* remove sensor
-	--------------------------------------------------------------------------- */
-	if ($action == "removeSensor") {
-
-		$query = "UPDATE ".$db_prefix."sensors SET monitoring='". 0 ."' WHERE sensor_id='".$getID."'";
-		$result = $mysqli->query($query);
-
-		// Redirect
-		header("Location: ?page=sensors&msg=02");
-		exit();
-	}
-
-
-
-	/* Set public
-	--------------------------------------------------------------------------- */
-	if ($action == "setSensorPublic") {
-
-		$query = "UPDATE ".$db_prefix."sensors SET public='". 1 ."' WHERE sensor_id='".$getID."'";
-		$result = $mysqli->query($query);
-
-		// Redirect
-		header("Location: ".$_SERVER['HTTP_REFERER']."");
-		exit();
-	}
-
-	/* Set non public
-	--------------------------------------------------------------------------- */
-	if ($action == "setSensorNonPublic") {
-
-		$query = "UPDATE ".$db_prefix."sensors SET public='". 0 ."' WHERE sensor_id='".$getID."'";
-		$result = $mysqli->query($query);
-
-		// Redirect
-		header("Location: ".$_SERVER['HTTP_REFERER']."");
-		exit();
-	}
 
 	
 ?>

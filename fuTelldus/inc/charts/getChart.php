@@ -1,7 +1,7 @@
-<!--<script src="../../lib/packages/jquery/jquery-1.9.1.min.js"></script>
-<script src="../../lib/packages/Highstock-1.3.1/js/highstock.js"></script>
-<script src="../../lib/packages/Highstock-1.3.1/js/modules/exporting.js"></script> 
-<script src="../../lib/jscripts/jquery.bootstrap.confirm.popover.js"></script>
+<!--<script src="../../lib/packages/jquery/jquery-1.9.1.min.js"></script>-->
+<!-- <script src="lib/packages/Highstock-1.3.1/js/highstock.js"></script>
+<script src="lib/packages/Highstock-1.3.1/js/modules/exporting.js"></script> -->
+<!-- <script src="../../lib/jscripts/jquery.bootstrap.confirm.popover.js"></script>
 <script src="../../lib/packages/jquery-ui-1.10.2.custom/js/jquery-ui-1.10.2.custom.min.js"></script>
 <link href="../../lib/packages/jquery-ui-1.10.2.custom/css/smoothness/jquery-ui-1.10.2.custom.min.css" rel="stylesheet">
 <script src="../../lib/packages/timeago_jquery/jquery.timeago.js"></script>
@@ -13,7 +13,6 @@
 
 	require_once("../../lib/config.inc.php");
 	require_once("../../lib/base.inc.php");
-
 	// Create DB-instance
 	$mysqli = new Mysqli($host, $username, $password, $db_name); 
 
@@ -30,7 +29,7 @@
 	$text = generateSceneChart($id, $data);
 	
 	echo $text;
-	echo "<div id='container' style='height: 500px; min-width: 500px'></div>";
+	echo "<div id='container' style='height: 480px; min-width: 480px'></div>";
 
 	function generateSceneChart($id, $data) {
 		$scenes = json_decode($data);
@@ -184,8 +183,8 @@
 					// See source code from the JSONP handler at https://github.com/highslide-software/highcharts.com/blob/master/samples/data/from-sql.php
 					var startTime=1;
 					
-					//$.getJSON('http://telldus.hca-erfurt.de/inc/charts/getChartDataJSON.php?type=scene&data={$data}&start=1371757044000&callback=?', function(data) {
-					$.getJSON('http://telldus.hca-erfurt.de/inc/charts/getChartDataJSON.php?data={$data}&start='+startTime+'&callback=?', function(data) {
+					//$.getJSON('getChartDataJSON.php?type=scene&data={$data}&start=1371757044000&callback=?', function(data) {
+					$.getJSON('inc/charts/getChartDataJSON.php?data={$data}&start='+startTime+'&callback=?', function(data) {
 						
 								
 						// create the chart
@@ -283,7 +282,7 @@
 						range = e.max - e.min;
 					var chart = $('#container').highcharts();
 					chart.showLoading('Loading data from server...');
-					$.getJSON('http://telldus.hca-erfurt.de/inc/charts/getChartDataJSON.php?data={$data}&start='+ Math.round(e.min) +
+					$.getJSON('inc/charts/getChartDataJSON.php?data={$data}&start='+ Math.round(e.min) +
 							'&end='+ Math.round(e.max) +'&callback=?', function(data) {";
 		
 		// add callback from array

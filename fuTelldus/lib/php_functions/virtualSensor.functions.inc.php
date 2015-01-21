@@ -28,32 +28,33 @@
 	}
 	
 	
-	function getCurrentVirtualSensorState($virtualSensorID) {
+	function getCurrentVirtualSensorState($virtualSensorID, $userID) {
 		global $mysqli;
 		global $db_prefix;
 
-		$parameter = getPluginParameters($virtualSensorID);
-		
-		return getCurrentVirtualSensorStateWithParameter($virtualSensorID, $parameter);
+		$parameter = getPluginParameters($virtualSensorID, 'sensor', $userID);
+
+ 		return getCurrentVirtualSensorStateWithParameter($virtualSensorID, $parameter);
 	}
 	
 	function getCurrentVirtualSensorStateWithParameter($virtualSensorID, $parameter) {
 		global $mysqli;
 		global $db_prefix;
 	
-		// find the script
-		$phpscript = getPluginPathToVSensorId($virtualSensorID);
-	
-		$nameSpace = includePlugin($phpscript."/index.php");
-		$func = $nameSpace."\\getVirtualSensorVal";
-		//include_once $phpscript."/index.php";
-		$returnFromScript = @$func($parameter, $virtualSensorID);
-	
 		// update last check
 		$lastUpdated = time();
 		$updateCheck = "update ".$db_prefix."virtual_sensors set last_check='".$lastUpdated."' WHERE id='".$virtualSensorID."'";
 		$mysqli->query($updateCheck);
-	
+		
+		
+		// find the script
+		$phpscript = getPluginPathToVSensorId($virtualSensorID);
+		
+		$nameSpace = includePlugin($phpscript."/index.php");
+		$func = $nameSpace."\\getVirtualSensorVal";
+		//include_once $phpscript."/index.php";
+		$returnFromScript = @$func($parameter, $virtualSensorID);
+		
 		return $returnFromScript;
 	}
 	
@@ -65,14 +66,16 @@
 		// find the script
 		$phpscript = getPluginPathToVSensorId($virtualSensorID);
 		$nameSpace = includePlugin($phpscript."/index.php");
-		
+
 		$funcGroup = $nameSpace."\\groupChartData";
 		// get the data from the DB
 		if (function_exists($funcGroup)) {
 			$returnFundGroup = @$funcGroup();
 			if (isset($returnFundGroup) and $returnFundGroup==true){
 				$chartData = getChartData($virtualSensorID, $start, $end, true);
-			} 
+			} else {
+				$chartData = getChartData($virtualSensorID, $start, $end, false);
+			}
 		}else {
 			$chartData = getChartData($virtualSensorID, $start, $end, false);
 		}
@@ -146,6 +149,7 @@
 		return function_exists($func);
 	}
 	
+
 	// return an array with all returntypes of the virtual sensor and the requested data
 	function getChartData($virtualSensorID, $start, $end, $groupData) {
 		global $db_prefix;
@@ -178,15 +182,13 @@
 			$rangeValue=1;
 		}
 		
-		
-		
 		// get all return types
 		$queryVirtualSensorReturnTypes ="select vstc.value_key from ".$db_prefix."virtual_sensors vs, ".$db_prefix."plugins_config vstc
 			where vs.id = $virtualSensorID
 			and vs.sensor_type = vstc.type_int
 			and vstc.value_type like 'return%'";
 		$queryResultReturnTypes = $mysqli->query($queryVirtualSensorReturnTypes);
-		
+
 		// for every returntype get the data and store to the array
 		$chartDataArray = array();
 		while ($returnTypeRow = $queryResultReturnTypes->fetch_array()) {
@@ -208,7 +210,6 @@
 			}
 			$chartDataArray[$returnType] = $dataArray;
 		}
-		
 		
 		return $chartDataArray;
 	}
@@ -279,7 +280,7 @@
 		global $db_prefix;
 		global $mysqli;
 
-		$queryTimestamp = "select time_updated from futelldus_virtual_sensors_log where sensor_id='".$virtualSensorID."' order by time_updated desc limit 1";
+		$queryTimestamp = "select time_updated from ".$db_prefix."virtual_sensors_log where sensor_id='".$virtualSensorID."' order by time_updated desc limit 1";
 		$result = $mysqli->query($queryTimestamp);
 		$timeStamp=0;
 		if (mysqli_num_rows($result) == 1) {
@@ -293,7 +294,7 @@
 		global $db_prefix;
 		global $mysqli;
 
-		$queryTimestamp = "select last_update from futelldus_virtual_sensors where id='".$virtualSensorID."' order by last_update desc limit 1";
+		$queryTimestamp = "select last_update from ".$db_prefix."virtual_sensors where id='".$virtualSensorID."' order by last_update desc limit 1";
 		$result = $mysqli->query($queryTimestamp);
 		$timeStamp=0;
 		if (mysqli_num_rows($result) == 1) {
@@ -342,9 +343,21 @@
 		global $mysqli;
 		global $db_prefix;
 		
-		$query = "select vs.* from futelldus_virtual_sensors vs, futelldus_plugins p where p.type_int = vs.sensor_type and vs.user_id='".$userID."' order by vs.description asc";
+		$query = "select vs.* from ".$db_prefix."virtual_sensors vs, ".$db_prefix."plugins p where p.type_int = vs.sensor_type and vs.user_id='".$userID."' order by vs.description asc";
 		$result = $mysqli->query($query);
 	
 		return $result;
 	}
+	
+	function getCountSensorLogToReturnParameter($sensorID, $parameter) {
+		global $mysqli;
+		global $db_prefix;
+		
+		$query = "select count(time_updated) as count from ".$db_prefix."virtual_sensors_log_values vslv, ".$db_prefix."virtual_sensors_log vsl where vsl.id = vslv.log_id and vsl.sensor_id='".$sensorID."' and length(value)>0 and value_key='".$parameter."'";
+		
+		$result = $mysqli->query($query);
+		$resultArr = $result->fetch_assoc();
+		return $resultArr['count'];
+	}
+	
 ?>

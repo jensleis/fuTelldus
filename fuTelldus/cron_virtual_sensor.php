@@ -42,7 +42,7 @@
 	    while ($row2 = $result2->fetch_array()) {
 			$lastUpdated = time();
 		
-			$returnValues = getCurrentVirtualSensorState($row2['id']);
+			$returnValues = getCurrentVirtualSensorState($row2['id'], $row['user_id']);
 			
 			// get all return types
 			$queryReturnType = "select vstc.value_key from ".$db_prefix."plugins_config vstc, ".$db_prefix."virtual_sensors vs where vs.id=".$row2['id']." and vstc.type_int = vs.sensor_type and vstc.value_type='return'";
@@ -97,13 +97,6 @@
 					$sqlInsert = str_replace("%%LOGID%%", $log_id, $sqlInsert);
 					$mysqli->query($sqlInsert);
 				}
-			
-			
-				$pushover_key = $row['pushover_key'];
-				$subject = "Status changed";
-				$message =  "The status of jens@home changed to ".$valueChangedTo;
-
-			//	sendNotification($pushover_key, $subject, $message);
 			} else {
 				//echo "no values changed\n";
 			}	

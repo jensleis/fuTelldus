@@ -11,18 +11,11 @@
 	
 	// get parameter
 	$id = clean($_GET['id']);
-	$type = clean($_GET['type']);
 	$pos = clean($_GET['pos']);
 	
 	/* Generate the chart
 	-------------------------------------------------------*/
-	if ($type == "sensor") {
-		updatePositionSensor($id, $pos);
-	}
-	
-	if ($type == "virtual") {
-		updatePositionVirtualSensor($id, $pos);
-	}
+	updatePositionVirtualSensor($id, $pos);
 	
 	function updatePositionVirtualSensor($id, $pos) {
 		global $mysqli;
@@ -32,15 +25,6 @@
 		echo $query;
 		$mysqli->query($query);
 	}
-	
-	function updatePositionSensor($id, $pos) {
-		global $mysqli;
-		global $db_prefix;
-	
-		$query = "UPDATE ".$db_prefix."sensors SET show_in_main=".$pos." WHERE sensor_id=".$id."";
-		$mysqli->query($query);
-	}
-	
 	
 	
 

@@ -1,15 +1,16 @@
 <?php
-	echo "<h4>Virtual sensor plugin configuration</h4>";
-
+	
 	/* Messages
 	--------------------------------------------------------------------------- */
 	if (isset($_GET['msg'])) {
-		if ($_GET['msg'] == 01) echo "<div class='alert alert-success'>Plugin activated</div>";
-		if ($_GET['msg'] == 02) echo "<div class='alert alert-success'>Plugin disabled</div>";
-		if ($_GET['msg'] == 03) echo "<div class='alert alert-success'>Plugin visiblaty changed</div>";
-		if ($_GET['msg'] == 04) echo "<div class='alert alert-success'>Plugin updated</div>";
+		if ($_GET['msg'] == 01) echo "<div class='alert alert-success autohide'>Plugin activated</div>";
+		if ($_GET['msg'] == 02) echo "<div class='alert alert-success autohide'>Plugin disabled</div>";
+		if ($_GET['msg'] == 03) echo "<div class='alert alert-success autohide'>Plugin visiblaty changed</div>";
+		if ($_GET['msg'] == 04) echo "<div class='alert alert-success autohide'>Plugin updated</div>";
 	}
-
+	
+	echo "<h4>Virtual sensor plugin configuration</h4>";
+		
 	/* Form
 	--------------------------------------------------------------------------- */
 	echo "<fieldset>";
@@ -53,15 +54,19 @@
 		
 			echo "<ul class='dropdown-menu'>";
 							if ($activated) {
-			echo "<li><a href='?page=plugins_exec&action=disablePlugin&id=".$pluginConfig['type_int']."'>Disable</a></li>";
+								echo "<li><a href='?page=plugins_exec&action=disablePlugin&id=".$pluginConfig['type_int']."'>Disable</a></li>";
 		
 								if ($pluginConfig['hidden']==1){
-			echo "<li><a href='?page=plugins_exec&action=hidePlugin&id=".$pluginConfig['type_int']."&toHide=0'>Show user configuration</a></li>";
+									echo "<li><a href='?page=plugins_exec&action=hidePlugin&id=".$pluginConfig['type_int']."&toHide=0'>Show user configuration</a></li>";
 								} else {
 									echo "<li><a href='?page=plugins_exec&action=hidePlugin&id=".$pluginConfig['type_int']."&toHide=1'>Hide user configuration</a></li>";
 								}
 							} else {
-								echo "<li><a href='?page=plugins_exec&action=activatePlugin&id=".$plugins[$key]["directory"]."&plugin_name=".$name."&plugin_type=".$pluginType."&version=".$version."'>Activate</a></li>";
+								$settings_page = null;
+								if (array_key_exists("user-settings-page", $plugins[$key])) {
+									$settings_page = $plugins[$key]["user-settings-page"];
+								}
+								echo "<li><a href='?page=plugins_exec&action=activatePlugin&id=".$plugins[$key]["directory"]."&plugin_name=".$name."&plugin_type=".$pluginType."&version=".$version."&plugin_user_settings_path=".$settings_page."'>Activate</a></li>";
 			}
 												echo "</ul>";
 					echo "</div>";

@@ -21,23 +21,27 @@ namespace cocoon\control_cocoon;
 	function updateHook() {
 		return getConfigArray();
 	}
-	
+
 	function getConfigArray() {
 		return $configs = array(
-				'cocoon_mac' => array('Cocoon device MAC' => 'text'),
-				'snmp_host' => array('SNMP Host IP' => 'text'),
+				array('key' => 'cocoon_mac',
+						'type' => 'text',
+						'description' => 'Cocoon device MAC'),
+				array('key' => 'snmp_host',
+						'type' => 'text',
+						'description' => 'SNMP Host IP')
 		);
 	}
 	
 	// contains the logic to turn the device on
 	// return 1 on success, 0 on error
 	function switchOn($parameter, $deviceID) {
-		$cocoonMac = $parameter['cocoon_mac'];
-		$routerIP = $parameter['snmp_host'];
+		$cocoonMac = $parameter['cocoon_mac']['value'];
+		$routerIP = $parameter['snmp_host']['value'];
 		
 		//getDeviceIP
 		$cocoonIP = getDeviceIP($routerIP, $cocoonMac);
-		
+
 		//send th request
 		$cmdValue = '<control>SetPower</control><value>ON</value>';
 		$postCmd = buildPostParameters($cmdValue);
@@ -56,8 +60,8 @@ namespace cocoon\control_cocoon;
 	
 	// should return 1 if the device is on and 0 if off
 	function getStatus($parameter, $deviceID) {
-		$cocoonMac = $parameter['cocoon_mac'];
-		$routerIP = $parameter['snmp_host'];
+		$cocoonMac = $parameter['cocoon_mac']['value'];
+		$routerIP = $parameter['snmp_host']['value'];
 		
 		//getDeviceIP
 		$cocoonIP = getDeviceIP($routerIP, $cocoonMac);
@@ -94,8 +98,8 @@ namespace cocoon\control_cocoon;
 	// contains the logic to turn the device off
 	// return 1 on success, 0 on error
 	function switchOff($parameter, $deviceID) {
-		$cocoonMac = $parameter['cocoon_mac'];
-		$routerIP = $parameter['snmp_host'];
+		$cocoonMac = $parameter['cocoon_mac']['value'];
+		$routerIP = $parameter['snmp_host']['value'];
 		
 		//getDeviceIP
 		$cocoonIP = getDeviceIP($routerIP, $cocoonMac);
@@ -117,7 +121,7 @@ namespace cocoon\control_cocoon;
 	}
 
 	function getDeviceIP($host, $device) {
-		$shellCommand = "sudo nmap -sP ".$host."/24 | grep -B2 -i ".$device." 2>&1";
+		$shellCommand = "sudo /usr/bin/nmap -sP ".$host."/24 | grep -B2 -i ".$device." 2>&1";
 		$output = shell_exec($shellCommand);
 
 		if (strlen(stristr($output,$device))>0) {

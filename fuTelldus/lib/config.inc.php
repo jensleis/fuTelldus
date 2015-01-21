@@ -28,8 +28,8 @@
 	/* PHP error reporting
 	--------------------------------------------------------------------------- */
 	error_reporting(E_ALL ^ E_NOTICE);
-	ini_set('include_path', '/www/fuTelldus/');
-	
+	ini_set('include_path', 'C:\Users\jensl\git\fuTelldus\fuTelldus');
+
 	define('DB_USERNAME', $username);
 	define('DB_PASSWORD', $password);
 	define('DB_NAME', $db_name);

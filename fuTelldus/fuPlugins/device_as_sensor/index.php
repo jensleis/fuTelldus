@@ -27,10 +27,18 @@ namespace virtual_devices\device_as_sensor;
 	
 	function getConfigArray() {
 		return $configs = array(
-			'device_id' => array('Telldus device id' => 'text'), 
-			'on_desc' => array('Description when on' => 'text'), 
-			'off_desc' => array('Description when off' => 'text'), 
-			'status' => array('Status' => 'return')
+				array('key' => 'device_id',
+						'type' => 'text',
+						'description' => 'Telldus device id'),
+				array('key' => 'on_desc',
+						'type' => 'text',
+						'description' => 'Description when on'),
+				array('key' => 'off_desc',
+						'type' => 'text',
+						'description' => 'Description when off'),
+				array('key' => 'status',
+						'type' => 'return',
+						'description' => 'Status')
 		);
 	}
 	
@@ -72,9 +80,9 @@ namespace virtual_devices\device_as_sensor;
 	}
 	
 	function getVirtualSensorVal($parameter, $virtualSensorID) {
-		$device = $parameter['device_id'];
-		
-		$actState = trim(getDeviceState($device));
+		$device = $parameter['device_id']['value'];
+
+		$actState = trim(getCurrentVirtualDeviceStateWithoutUser($device));
 		$returnValArr = array(
 			'status'=>$actState
 		);

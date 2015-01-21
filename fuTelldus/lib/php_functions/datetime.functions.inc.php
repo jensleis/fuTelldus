@@ -19,29 +19,45 @@
 	}
 	
 	
-	function date_findMonthName($monthNumb) {
-		if ($monthNumb == 1) return "januar";
-		elseif ($monthNumb == 2) return "februar";
-		elseif ($monthNumb == 3) return "mars";
-		elseif ($monthNumb == 4) return "april";
-		elseif ($monthNumb == 5) return "mai";
-		elseif ($monthNumb == 6) return "juni";
-		elseif ($monthNumb == 7) return "juli";
-		elseif ($monthNumb == 8) return "august";
-		elseif ($monthNumb == 9) return "september";
-		elseif ($monthNumb == 10) return "oktober";
-		elseif ($monthNumb == 11) return "november";
-		elseif ($monthNumb == 12) return "desember";
+	function date_findMonthName($monthNumb, $lang) {
+		if ($lang == "de") {
+			if ($monthNumb == 1) return "Januar";
+			elseif ($monthNumb == 2) return "Februar";
+			elseif ($monthNumb == 3) return "März";
+			elseif ($monthNumb == 4) return "April";
+			elseif ($monthNumb == 5) return "Mai";
+			elseif ($monthNumb == 6) return "Juni";
+			elseif ($monthNumb == 7) return "Juli";
+			elseif ($monthNumb == 8) return "August";
+			elseif ($monthNumb == 9) return "September";
+			elseif ($monthNumb == 10) return "Oktober";
+			elseif ($monthNumb == 11) return "November";
+			elseif ($monthNumb == 12) return "Dezember";
+		} else { // en
+			if ($monthNumb == 1) return "January";
+			elseif ($monthNumb == 2) return "February";
+			elseif ($monthNumb == 3) return "March";
+			elseif ($monthNumb == 4) return "April";
+			elseif ($monthNumb == 5) return "May";
+			elseif ($monthNumb == 6) return "June";
+			elseif ($monthNumb == 7) return "July";
+			elseif ($monthNumb == 8) return "August";
+			elseif ($monthNumb == 9) return "September";
+			elseif ($monthNumb == 10) return "October";
+			elseif ($monthNumb == 11) return "November";
+			elseif ($monthNumb == 12) return "December";
+		}
 	}
 	
-	function date_stringDate($time) {
+	
+	function date_stringDate($time, $lang) {
 		$day = date("d", $time);
 		$dayNumb = date("N", $time);
 		$month = date("m", $time);
 		$year = date("Y", $time);
 		
 		$dayName = date_findDayName($dayNumb);
-		$monthName = date_findMonthName($month);
+		$monthName = date_findMonthName($month, $lang);
 		
 		return "$day. $monthName $year";
 	}

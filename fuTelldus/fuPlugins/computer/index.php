@@ -50,28 +50,34 @@ namespace computer\owl_energy_monitor;
 	
 	function getConfigArray() {
 		return $configs = array(
-				'device' => array('Network device' => 'plugin;sensor;network_scan'),
-				'remote_user' => array('Remote user' => 'text'),
-				'remote_password' => array('Remote password' => 'password'),
+				array('key' => 'device',
+						'type' => 'plugin;sensor;network_scan',
+						'description' => 'Network device'),
+				array('key' => 'remote_user',
+						'type' => 'text',
+						'description' => 'Remote user'),
+				array('key' => 'remote_password',
+						'type' => 'password',
+						'description' => 'Remote password')
 		);
 	}
 	
 	// contains the logic to turn the device on
 	// return 1 on success, 0 on error
 	function switchOn($parameter, $deviceID) {
-		$pluginID = $parameter['device'];
-		$mac = getPluginParameters($pluginID)['mac_client'];
+		$pluginID = $parameter['device']['value'];
+		$mac = getPluginParametersWithoutUser($pluginID, 'device')['mac_client']['value'];
 		$return = wake(null, $mac);
 		return $return;
 	}
 	
 	// should return 1 if the device is on and 0 if off
 	function getStatus($parameter, $deviceID) {
-		$pluginID = $parameter['device'];
+		$pluginID = $parameter['device']['value'];
 		
 		// overwrite parameter timout
-		$parameter = getPluginParameters($pluginID);
-		$parameter['timeout'] = 0;
+		$parameter = getPluginParametersWithoutUser($pluginID, 'device');
+		$parameter['timeout']['value'] = 0;
 		
 		$currentState = getCurrentVirtualSensorStateWithParameter($pluginID, $parameter);
 		return $currentState['available'];
@@ -80,11 +86,11 @@ namespace computer\owl_energy_monitor;
 	// contains the logic to turn the device off
 	// return 1 on success, 0 on error
 	function switchOff($parameter, $deviceID) {
-		$pluginID = $parameter['device'];
-		$mac = getPluginParameters($pluginID)['mac_client'];
-		$ip = getPluginParameters($pluginID)['snmp_host'];
-		$remoteUser = $parameter['remote_user'];
-		$remotePassword = $parameter['remote_password'];
+		$pluginID = $parameter['device']['value'];
+		$mac = getPluginParametersWithoutUser($pluginID, 'device')['mac_client']['value'];
+		$ip = getPluginParametersWithoutUser($pluginID, 'device')['snmp_host']['value'];
+		$remoteUser = $parameter['remote_user']['value'];
+		$remotePassword = $parameter['remote_password']['value'];
 		$deviceIP = getDeviceIP($ip, $mac);
 		
 		shell_exec("net rpc shutdown -I ".$deviceIP." -U ".$remoteUser."%".$remotePassword."");
@@ -126,7 +132,7 @@ namespace computer\owl_energy_monitor;
 	}
 
 	function getDeviceIP($host, $device) {
-		$shellCommand = "sudo nmap -sP ".$host."/24 | grep -B2 -i ".$device." 2>&1";
+		$shellCommand = "sudo /usr/bin/nmap -sP ".$host."/24 | grep -B2 -i ".$device." 2>&1";
 		$output = shell_exec($shellCommand);
 	
 		if (strlen(stristr($output,$device))>0) {

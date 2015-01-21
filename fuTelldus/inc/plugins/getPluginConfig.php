@@ -17,6 +17,10 @@
 	
 	$type_int = clean($_GET['type_int']);
 	$plugin_id = clean($_GET['plugin_id']);
+	$configType = "";
+	if (isset($_GET['configType'])) {
+		$configType = " and config_type='".clean($_GET['configType'])."'";
+	}
 	
 	// decide if the current config value should be attached or not
 	if (strlen($plugin_id) > 0) {
@@ -25,12 +29,12 @@
 			where vsc.config_id = vstc.id 
 			and vsc.sensor_id=$plugin_id 
 			and vstc.type_int=$type_int 
-			and vstc.value_type not like 'return%'";
+			and vstc.value_type not like 'return%' ".$configType;
 	} else {
 		$query = "SELECT id, value_key, value_type, description, '' as config_value 
 			FROM ".$db_prefix."plugins_config 
 			WHERE type_int=$type_int 
-			and value_type not like 'return%'";
+			and value_type not like 'return%' ".$configType;
 	}
 	
 	$result = $mysqli->query($query);

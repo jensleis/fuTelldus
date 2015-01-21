@@ -9,6 +9,7 @@
 	/* Get parameters
 	--------------------------------------------------------------------------- */
 	if (isset($_GET['id'])) $getID = clean($_GET['id']);
+	if (isset($_GET['userid'])) $userID = clean($_GET['userid']);
 	if (isset($_GET['action'])) $action = clean($_GET['action']);
 	if (isset($_GET['state'])) $state = clean($_GET['state']);
 	if (isset($_GET['btnID'])) $btnID = clean($_GET['btnID']);
@@ -16,7 +17,7 @@
 
 	// get the plugin
 	$path = getPluginPathToVDeviceId($getID);
-	$parameter = getPluginParameters($getID);
+	$parameter = getPluginParameters($getID, 'device', $userID);
 	$nameSpace = includePlugin($path."/index.php");
 	$funcOff = $nameSpace."\\switchOff";
 	$funcOn = $nameSpace."\\switchOn";

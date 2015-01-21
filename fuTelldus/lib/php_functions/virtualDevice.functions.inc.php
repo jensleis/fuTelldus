@@ -25,26 +25,34 @@
 		return $typeDescription;
 	}
 	
-	function getCurrentVirtualDeviceState($deviceID) {
+	function getCurrentVirtualDeviceState($deviceID, $userID) {
+	
 		global $mysqli;
 		global $db_prefix;
-		
-		$parameter = getPluginParameters($deviceID);
+			
+		$parameter = getPluginParameters($deviceID, 'device', $userID);
 		
 		// find the script
 		$phpscript = getPluginPathToVDeviceId($deviceID);
-		
-		$nameSpace = includePlugin($phpscript."/index.php");
-		$func = $nameSpace."\\getStatus";	
-		//include_once $phpscript."/index.php";		
-		$returnFromScript = @$func($parameter, $deviceID); 	
 
+		$nameSpace = includePlugin($phpscript."/index.php");
+		$func = $nameSpace."\\getStatus";
+		//include_once $phpscript."/index.php";
+		$returnFromScript = @$func($parameter, $deviceID);
+	
 		// update last state
 		$updateCheck = "update ".$db_prefix."virtual_devices set last_status='".$returnFromScript."' WHERE id='".$deviceID."'";
 		$mysqli->query($updateCheck);
-		
+	
 		return $returnFromScript;
 	}
+	
+	function getCurrentVirtualDeviceStateWithoutUser($deviceID) {
+		$userID = getUserToDevices($deviceID);
+		
+		return getCurrentVirtualDeviceState($deviceID, $userID);
+	}
+	
 	
 	// return the unix-timestamp when the last switch of the device took place
 	function getLastVirtualDeviceStatusSwitch($virtualDeviceID){
@@ -89,9 +97,21 @@
 		global $mysqli;
 		global $db_prefix;
 		
-		$query = "select vd.* from futelldus_virtual_devices vd, futelldus_plugins p where p.type_int = vd.plugin_id and vd.user_id='".$userID."' order by vd.description asc";
+		$query = "select vd.* from ".$db_prefix."virtual_devices vd, ".$db_prefix."plugins p where p.type_int = vd.plugin_id and vd.user_id='".$userID."' order by vd.description asc";
 		$result = $mysqli->query($query);
 		
 		return $result;
+	}
+	
+	function getUserToDevices($deviceID){
+		global $mysqli;
+		global $db_prefix;
+		
+		$query = "select user_id from ".$db_prefix."virtual_devices where id='".$deviceID."'";
+		
+		$result = $mysqli->query($query);
+		$userID = $result->fetch_assoc()['user_id'];
+	
+		return $userID;
 	}
 ?>

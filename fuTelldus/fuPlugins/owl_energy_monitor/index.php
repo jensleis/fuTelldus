@@ -31,9 +31,15 @@ namespace virtual_devices\owl_energy_monitor;
 	
 	function getConfigArray() {
 		return $configs = array(
-			'datafilepath' => array('Path to OWL-export file' => 'text'), 
-			'voltage' => array('Voltage' => 'text'),
-			'energy_consumption' => array('Energy consumption' => 'return') 
+				array('key' => 'datafilepath',
+						'type' => 'text',
+						'description' => 'Path to OWL-export file'),
+				array('key' => 'voltage',
+						'type' => 'text',
+						'description' => 'Voltage'),
+				array('key' => 'energy_consumption',
+						'type' => 'return',
+						'description' => 'Energy consumption')
 		);
 	}
 	
@@ -114,7 +120,7 @@ namespace virtual_devices\owl_energy_monitor;
 	
 	function getVirtualSensorVal($parameter, $virtualSensorID) {
 
-		$datafilepath=$parameter['datafilepath']; //"/cm160_data.db.txt";
+		$datafilepath=$parameter['datafilepath']['value']; //"/cm160_data.db.txt";
 
 		$lastCheck = getLastVirtualSensorLogTimestamp($virtualSensorID)-300; // remove an hour, to be sure
 		$currentTime = time() + date('Z') +300; // add an hour, just in case if the clocks are not synchron

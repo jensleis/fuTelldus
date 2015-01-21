@@ -8,6 +8,7 @@ class Session
 {
   private $alive = true;
   private $dbc = NULL;
+  private $db_prefix ="futelldus_";
  
   function __construct()
   {
@@ -62,7 +63,7 @@ class Session
  
   public function read($sid)
   {
-    $q = "SELECT `data` FROM `futelldus_sessions` WHERE `id` = '".$this->dbc->real_escape_string($sid)."' LIMIT 1";
+    $q = "SELECT `data` FROM futelldus_sessions WHERE `id` = '".$this->dbc->real_escape_string($sid)."' LIMIT 1";
     $r = $this->dbc->query($q);
  
     if($r->num_rows == 1)
@@ -79,7 +80,7 @@ class Session
  
   public function write($sid, $data)
   {
-    $q = "REPLACE INTO `futelldus_sessions` (`id`, `data`) VALUES ('".$this->dbc->real_escape_string($sid)."', '".$this->dbc->real_escape_string($data)."')";
+    $q = "REPLACE INTO futelldus_sessions (`id`, `data`) VALUES ('".$this->dbc->real_escape_string($sid)."', '".$this->dbc->real_escape_string($data)."')";
     $this->dbc->query($q);
  
     return $this->dbc->affected_rows;
@@ -87,7 +88,7 @@ class Session
  
   public function destroy($sid)
   {
-    $q = "DELETE FROM `futelldus_sessions` WHERE `id` = '".$this->dbc->real_escape_string($sid)."'"; 
+    $q = "DELETE FROM futelldus_sessions WHERE `id` = '".$this->dbc->real_escape_string($sid)."'"; 
     $this->dbc->query($q);
  
     $_SESSION = array();
@@ -97,7 +98,7 @@ class Session
  
   public function clean($expire)
   {
-    $q = "DELETE FROM `futelldus_sessions` WHERE DATE_ADD(`last_accessed`, INTERVAL ".(int) $expire." SECOND) < NOW()"; 
+    $q = "DELETE FROM futelldus_sessions WHERE DATE_ADD(`last_accessed`, INTERVAL ".(int) $expire." SECOND) < NOW()"; 
     $this->dbc->query($q);
  
     return $this->dbc->affected_rows;

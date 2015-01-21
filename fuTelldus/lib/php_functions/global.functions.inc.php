@@ -63,6 +63,11 @@
 				"title" => $subject,
 				"message" => $message,
 			));
+// 		echo "token: ". $config['pushover_api_token']."<br />";
+// 		echo "user: ". $pushover_key."<br />";
+// 		echo "title: ". $subject."<br />";
+// 		echo "message: ". $message."<br />";
+		
 		curl_setopt_array($ch, $params);
 		$response = curl_exec($ch);
 		curl_close($ch);

@@ -43,7 +43,7 @@
 }
 
 /*for jquery-ui buttons need set height to look more pretty*/
-.editable-buttons button.ui-button-icon-only {
+.editable-buttons button.ui-button-.glyphicon .glyphicon-only {
    height: 24px; 
    width: 30px;
 }
@@ -84,7 +84,7 @@
 }
 
 /* move datepicker icon to center of add-on button. See https://github.com/vitalets/x-editable/issues/183 */
-.editable-inline .add-on .icon-th {
+.editable-inline .add-on ..glyphicon .glyphicon-th {
    margin-top: 3px;
    margin-left: 1px; 
 }

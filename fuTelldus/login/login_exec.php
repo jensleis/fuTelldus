@@ -10,6 +10,9 @@
 	if (isset($_POST['mail'])) 
 		$mail = clean($_POST['mail']);
 	
+	if (isset($_POST['device_id']))
+		$device_id = clean($_POST['device_id']);
+	
 	if (isset($_POST['password'])) 
 		$password = clean($_POST['password']);
 		
@@ -21,7 +24,10 @@
 		$uniq = clean($_POST['uniq']);
 	
 	
-
+	if (isset($_GET['source'])) {
+		$source = $_GET['source'];
+	}
+		
 	// Check if form is filled out
 	if (empty($_POST['mail']) || empty($_POST['password'])) {
 		$error = true;
@@ -38,9 +44,9 @@
 		$error = true;
 	}
 	
-	echo "mail: $mail <br />";
-	echo "password: $password <br />";
-	echo "cryptPW: $cryptPW <br />";
+// 	echo "mail: $mail <br />";
+// 	echo "password: $password <br />";
+// 	echo "cryptPW: $cryptPW <br />";
 	
 	
 	// Redirect if an error is found
@@ -56,7 +62,6 @@
 		$result = $mysqli->query($query);
 		$numRowsLogin = $result->num_rows;
 		
-
 		if($result && $numRowsLogin>0) {
 			
 			// Regenerate session ID to prevent session fixation attacks
@@ -75,8 +80,19 @@
 
 
 			session_write_close();
-			
-			header("Location: ../index.php");
+			echo $device_id;
+			if ($source!=null) {
+				$redirect = "../".$source."/index.php";
+				if ($device_id!=null) {
+					$redirect = $redirect."?device_id=".$device_id;
+				}
+				echo $redirect;
+				header("Location: ".$redirect);
+			} else {
+				header("Location: ../index.php");
+			}
+// 			header("Location: ../index.php");
+// 			header("Location: ../".htmlspecialchars($_SESSION['request_uri']));
 			exit();
 		}
 		

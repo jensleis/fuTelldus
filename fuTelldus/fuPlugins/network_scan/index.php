@@ -28,13 +28,27 @@ namespace virtual_devices\network_scan;
 	
 	function getConfigArray() {
 		return $configs = array(
-			'mac_client' => array('Mac Address' => 'text'), 
-			'snmp_host' => array('Router IP' => 'text'), 
-			'timeout' => array('Timeout in minutes' => 'text'), 
-			'addSNMPCheck' => array('Perform SNMP check' => 'boolean'), 
-			'wakeupWithLastIP' => array('Send wakeup signal' => 'boolean'), 
-			'available' => array('Available' => 'return'), 
-			'ip' => array('IP address' => 'return')
+				array('key' => 'mac_client',
+						'type' => 'text',
+						'description' => 'Mac Address'),
+				array('key' => 'snmp_host',
+						'type' => 'text',
+						'description' => 'Router IP'),
+				array('key' => 'timeout',
+						'type' => 'text',
+						'description' => 'Timeout in minutes'),
+				array('key' => 'addSNMPCheck',
+						'type' => 'boolean',
+						'description' => 'Perform SNMP check'),
+				array('key' => 'wakeupWithLastIP',
+						'type' => 'boolean',
+						'description' => 'Send wakeup signal'),
+				array('key' => 'available',
+						'type' => 'return',
+						'description' => 'Available'),
+				array('key' => 'ip',
+						'type' => 'return',
+						'description'  => 'IP address')
 		);
 	}
 	
@@ -63,32 +77,37 @@ namespace virtual_devices\network_scan;
 			$widget.= "<div class='sensor-timeago'>";
 				$timeUpdatedByInsertedLog = getLastVirtualSensorLogTimestamp($virtualSensorID);
 				if ($timeUpdatedByInsertedLog==0){
-					$timeUpdatedByInsertedLog = time();
+					$widget.= "<abbr class=\"timeago\" title=''>never</abbr>";
+				} else {
+					$lastLogsTimestamp = getVirtualSensorTmpVal($virtualSensorID, "lastOfflineState");
+					$timeStyle = "";
+					if ($lastLogsTimestamp>0){
+						$timeStyle = "style='color:#580000;'";
+					}
+
+					$widget.= "<abbr class=\"timeago\" title='".date("c", $timeUpdatedByInsertedLog)."' ".$timeStyle.">".date("d-m-Y H:i", $timeUpdatedByInsertedLog)."</abbr>";
 				}
 				
-				$lastLogsTimestamp = getVirtualSensorTmpVal($virtualSensorID, "lastOfflineState");
-				$timeStyle = "";
-				if ($lastLogsTimestamp>0){
-					$timeStyle = "style='color:#580000;'";
-				}
 				
-				$widget.= "<abbr class=\"timeago\" title='".date("c", $timeUpdatedByInsertedLog)."' ".$timeStyle.">".date("d-m-Y H:i", $timeUpdatedByInsertedLog)."</abbr>";
+				
+				
 			$widget.= "</div>";
 		
 		return $widget;
 	}
 	
 	function getVirtualSensorVal($parameter, $virtualSensorID) {
-		$device = $parameter['mac_client']; //"58:1F:AA:B0:31:2A";
-		$host = $parameter['snmp_host']; //"192.168.1.1";
-		$timeout = $parameter['timeout']; //"timeout in minutes";
-		$addSNMPCheck = $parameter['addSNMPCheck']; //"check via SNMP?";
-		$wakeupWithLastIP = $parameter['wakeupWithLastIP']; //"send NMAP package on port 62078 before testing? --> wakeup iPhone's wifi";
+		$device = $parameter['mac_client']['value']; //"58:1F:AA:B0:31:2A";
+		$host = $parameter['snmp_host']['value']; //"192.168.1.1";
+		$timeout = $parameter['timeout']['value']; //"timeout in minutes";
+		$addSNMPCheck = $parameter['addSNMPCheck']['value']; //"check via SNMP?";
+		$wakeupWithLastIP = $parameter['wakeupWithLastIP']['value']; //"send NMAP package on port 62078 before testing? --> wakeup iPhone's wifi";
 
 		$available = 0;
 		$ip;
 		$returnLastLog = false;
 		
+
 		// fastpath - ping the ip
 		$available = tryPing($parameter, $virtualSensorID);
 		if ($available==1){
@@ -100,6 +119,7 @@ namespace virtual_devices\network_scan;
 			return $returnValArr;
 		}
 		
+	
 		if ($wakeupWithLastIP=='true') {
 			tryWakeUpWithOldIP($virtualSensorID);
 		}
@@ -111,6 +131,7 @@ namespace virtual_devices\network_scan;
 			}
 		}
 
+
 		if ($available<=0) {
 			if ($addSNMPCheck=='true') {
 				$available = trySNMPCheck($parameter, $virtualSensorID);
@@ -121,7 +142,6 @@ namespace virtual_devices\network_scan;
 				}
 			}
 		}
-		
 		
 		if ($returnLastLog){
 			$returnValArr = getLastVirtualSensorLog($virtualSensorID);
@@ -145,7 +165,7 @@ namespace virtual_devices\network_scan;
 	function tryPing($parameter, $virtualSensorID) {
 		$lastIP = getLastIP($virtualSensorID);
 	
-		$shellCommand = "sudo nmap -sP --max-retries=1 --host-timeout=125ms ".$lastIP." | grep  'Host is up' | wc -l 2>&1";
+		$shellCommand = "sudo /usr/bin/nmap -sP --max-retries=1 --host-timeout=125ms ".$lastIP." | grep  'Host is up' | wc -l 2>&1";
 		
 		$output = shell_exec($shellCommand);
 		
@@ -186,7 +206,7 @@ namespace virtual_devices\network_scan;
 	
 	
 	function getDeviceIP($host, $device) {
-		$shellCommand = "sudo nmap -sP ".$host."/24 | grep -B2 -i ".$device." 2>&1";
+		$shellCommand = "sudo /usr/bin/nmap -sP ".$host."/24 | grep -B2 -i ".$device." 2>&1";
 		$output = shell_exec($shellCommand);
 		
 		if (strlen(stristr($output,$device))>0) {
@@ -204,7 +224,7 @@ namespace virtual_devices\network_scan;
 	
 	function wakeup($ip) {
 		// contact the iphone on port 62078 to keep wifi on
-		$command = "sudo nmap -P0 -sT -p62078 ".$ip." 2>&1";
+		$command = "sudo /usr/bin/nmap -P0 -sT -p62078 ".$ip." 2>&1";
 		shell_exec($command);
 	}
 
@@ -231,6 +251,7 @@ namespace virtual_devices\network_scan;
 		}
 	}
 	
+	
 	function trySNMPCheck($parameter, $virtualSensorID) {
 		$device = $parameter['mac_client']; //"58:1F:AA:B0:31:2A";
 		$host = $parameter['snmp_host']; //"192.168.1.1";
@@ -239,9 +260,9 @@ namespace virtual_devices\network_scan;
 
 		$snmpReturnVals = snmp2_walk($host, $community, $snmpObj);
 
-		$contains = containsDevice($device, $snmpReturnVals);
+ 		$contains = containsDevice($device, $snmpReturnVals);
 		
-		return $contains;
+ 		return $contains;
 	}	
 	
 	function containsDevice($device, $snmpReturnVals) {
@@ -334,4 +355,5 @@ namespace virtual_devices\network_scan;
 	function groupChartData() {
 		return false;
 	}
+
 ?>

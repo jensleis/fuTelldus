@@ -3,7 +3,7 @@
 	//echo "<h4>".$lang['General settings']."</h4>";
 
 	if (isset($_GET['msg'])) {
-		if ($_GET['msg'] == 01) echo "<div class='alert alert-success'>{$lang['Data saved']}</div>";
+		if ($_GET['msg'] == 01) echo "<div class='alert alert-success autohide'>{$lang['Data saved']}</div>";
 	}
 ?>
 
@@ -15,45 +15,49 @@
 	<fieldset>
 		<legend><?php echo $lang['Page settings']; ?></legend>
 
-		<div class="control-group">
-			<label class="control-label" for="pageTitle"><?php echo $lang['Page title']; ?></label>
-			<div class="controls">
-				<input type="text" name='pageTitle' id="pageTitle" placeholder="<?php echo $lang['Page title']; ?>" value='<?php echo $config['pagetitle']; ?>'>
+		<div class="row">
+			<br />
+			<label class="control-label col-md-3" for="pageTitle"><?php echo $lang['Page title']; ?></label>
+			<div class="input-group col-md-5">
+				<input type="text" class="form-control" name='pageTitle' id="pageTitle" placeholder="<?php echo $lang['Page title']; ?>" value='<?php  if (isset($config['pagetitle']))echo $config['pagetitle']; ?>'>
 			</div>
 		</div>
 
-		<div class="control-group">
-			<label class="control-label" for="mail_from"><?php echo $lang['Outgoing mailaddress']; ?></label>
-			<div class="controls">
-				<input type="text" name='mail_from' id="mail_from" placeholder="<?php echo $lang['Outgoing mailaddress']; ?>" value='<?php echo $config['mail_from']; ?>'>
+		<div class="row">
+			<br />
+			<label class="control-label col-md-3" for="mail_from"><?php echo $lang['Outgoing mailaddress']; ?></label>
+			<div class="input-group col-md-5">
+				<input type="text" class="form-control" name='mail_from' id="mail_from" placeholder="<?php echo $lang['Outgoing mailaddress']; ?>" value='<?php if (isset($config['mail_from'])) echo $config['mail_from']; ?>'>
 			</div>
 		</div>
 
-		<div class="control-group">
-			<label class="control-label" for="chart_max_days"><?php echo $lang['Chart max days']; ?></label>
-			<div class="controls">
-				<input style='width:50px;' type="text" name='chart_max_days' id="chart_max_days" placeholder="<?php echo $lang['Chart max days']; ?>" value='<?php echo $config['chart_max_days']; ?>'>
+		<div class="row">
+			<br />
+			<label class="control-label col-md-3" for="chart_max_days"><?php echo $lang['Chart max days']; ?></label>
+			<div class="input-group col-md-5">
+				<input type="text" class="form-control" name='chart_max_days' id="chart_max_days" placeholder="<?php echo $lang['Chart max days']; ?>" value='<?php if (isset($config['chart_max_days'])) echo $config['chart_max_days']; ?>'>
 			</div>
 		</div>
 		
-		<div class="control-group">
-			<label class="control-label" for="pushover_api_token"><?php echo $lang['Pushover API token']; ?></label>
-			<div class="controls">
-				<input type="text" name='pushover_api_token' id="pushover_api_token" placeholder="<?php echo $lang['Pushover API token']; ?>" value='<?php echo $config['pushover_api_token']; ?>'>
+		<div class="row">
+			<br />
+			<label class="control-label col-md-3" for="pushover_api_token"><?php echo $lang['Pushover API token']; ?></label>
+			<div class="input-group col-md-5">
+				<input type="text" class="form-control" name='pushover_api_token' id="pushover_api_token" placeholder="<?php echo $lang['Pushover API token']; ?>" value='<?php if (isset($config['pushover_api_token'])) echo $config['pushover_api_token']; ?>'>
 			</div>
 		</div>
 
 		<?php
-			echo "<div class='control-group'>";
-				echo "<label class='control-label' for='language'>{$lang['Public']} ".strtolower($lang['Language'])."</label>";
-				echo "<div class='controls'>";
+			echo "<div class='row'><br />";
+				echo "<label class='control-label col-md-3' for='language'>{$lang['Public']} ".strtolower($lang['Language'])."</label>";
+				echo "<div class='input-group col-md-5'>";
 
 					echo "<label class='language'>";
 						$sourcePath = "lib/languages/";
 						$sourcePath = utf8_decode($sourcePath); // Encode for æøå-characters
 						$handler = opendir($sourcePath);
 						
-						echo "<select name='language'>";
+						echo "<select name='language' class='form-control'>";
 							while ($file = readdir($handler)) {
 								$file = utf8_encode($file); // Encode for æøå-characters
 								
@@ -75,11 +79,9 @@
 		?>
 
 	</fieldset>
-
-
-	<hr />
-
-	<div class="control-group">
+	<br />
+	
+	<div class="form-group">
 		<div class="controls pull-right">
 			<button type="submit" class="btn btn-primary"><?php echo $lang['Save data']; ?></button>
 		</div>

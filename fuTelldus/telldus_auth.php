@@ -9,7 +9,7 @@
 	$_SESSION['batch']='telldus_auth';
 
 	$lightOpenID = new LightOpenID();
-	$lightOpenID->identity = 'http://login.telldus.com';
+	$lightOpenID->identity = 'https://login.telldus.com';
 	$lightOpenID->required = array('contact/email', 'namePerson');
 
 	if ($_GET['openid_mode'] == 'id_res') {

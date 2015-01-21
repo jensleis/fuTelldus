@@ -69,7 +69,7 @@ $lang = array(
 	"Login" => "Login",
 	"Email" => "Email",
 	"Password" => "Password",
-	"Leave field to keep current" => "Leave password field empty to keep currect",
+	"Leave field to keep current" => "Leave password field empty to keep current",
 	"User language" => "User language",
 	"Save data" => "Save data",
 	"Create user" => "Create user",
@@ -118,7 +118,7 @@ $lang = array(
 	"Sensorname" => "Sensorname",
 	"Sensordata" => "Sensordata",
 	"Sensor ID" => "Sensor ID",
-	"Sensors description" => "<p>Add your sensors to the cronjob for logging the sensordata into database.</p><p>Sensorlist is retrieved with keys added under <a href='?page=settings&view=user'>your userprofile</a>.</p>",
+	"Sensors description" => "<p>Enable Monitoring to let the cron-job automatically update the sensor data periodically.</p>",
 	"Non public" => "Non public",
 	"Public" => "Public",
 

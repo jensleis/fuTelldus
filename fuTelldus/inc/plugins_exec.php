@@ -13,8 +13,8 @@
 		$plugin_name = clean($_GET['plugin_name']);
 		$version = clean($_GET['version']);
 		$pluginType = clean($_GET['plugin_type']);
-		
-		activatePlugin($plugin_name, $getID, $version, $pluginType);
+		$plugin_user_settings_path =  clean($_GET['plugin_user_settings_path']);
+		activatePlugin($plugin_name, $getID, $plugin_user_settings_path, $version, $pluginType);
 
 		header("Location: ?page=settings&view=plugins&msg=01");
 		exit();
